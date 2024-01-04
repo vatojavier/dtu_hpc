@@ -35,7 +35,7 @@ PERM="mkn"
 # BLKSIZE=1
 
 # enable(1)/disable(0) result checking
-export MATMULT_COMPARE=0
+export MATMULT_COMPARE=1
 
 # start the collect command with the above settings
 for S in $SIZES
