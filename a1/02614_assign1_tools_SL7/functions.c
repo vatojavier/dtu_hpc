@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <cblas.h>
+#define MIN(a,b) (((a)<(b))?(a):(b))
 
 void matmult_lib(int m, int n, int k, double **A, double **B, double **C) {
     double alpha = 1.0;
@@ -95,7 +96,26 @@ void matmult_knm(int m, int n, int k, double **A, double **B, double **C) {
     }
 }
 
+// block matrix multiplication
 void matmult_blk(int m, int n, int k, double **A, double **B, double **C, int bs) {
+    zeroC(m, n, C);
+    int nbm = m/bs;
+    int nbn = n/bs;
+    for (int bm = 0; bm<m; bm+=bs){
+        for (int bn = 0; bn<n; bn+=bs){
+            for (int i = 0; i < MIN(m-bm,bs); i++){
+                for (int j = 0; j < MIN(n-bn,bs); j++){
+                    for (int l = 0; l < k; l++) {
+                        C[i+bm][j+bn] += A[i+bm][l] * B[l][j+bn];
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+void matmult_blk2(int m, int n, int k, double **A, double **B, double **C, int bs) {
     zeroC(m, n, C);
     int nbm = m/bs;
     int nbn = n/bs;
