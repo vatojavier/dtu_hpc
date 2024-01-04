@@ -99,8 +99,6 @@ void matmult_knm(int m, int n, int k, double **A, double **B, double **C) {
 // block matrix multiplication
 void matmult_blk(int m, int n, int k, double **A, double **B, double **C, int bs) {
     zeroC(m, n, C);
-    int nbm = m/bs;
-    int nbn = n/bs;
     for (int bm = 0; bm<m; bm+=bs){
         for (int bn = 0; bn<n; bn+=bs){
             for (int i = 0; i < MIN(m-bm,bs); i++){
