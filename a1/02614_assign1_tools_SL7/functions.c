@@ -95,4 +95,50 @@ void matmult_knm(int m, int n, int k, double **A, double **B, double **C) {
     }
 }
 
+void matmult_blk(int m, int n, int k, double **A, double **B, double **C, int bs) {
+    zeroC(m, n, C);
+    int nbm = m/bs;
+    int nbn = n/bs;
+    // main whole blocks 
+    for (int bm = 0; bm<nbm; bm++){
+        for (int bn = 0; bn<nbn; bn++){
+            for (int i = 0; i < bs; i++){
+                for (int j = 0; j < bs; j++){
+                    for (int l = 0; l < k; l++) {
+                        C[i+(bm*bs)][j+bn*bs] += A[i+bm*bs][l] * B[l][j+bn*bs];
+                    }
+                }
+            }   
+        }
+    }
 
+    // now there are some remaining blocks left, which are handled separately
+    // bottom left
+    for (int bn = 0; bn<nbn; bn++){
+        for (int i = nbm*bs; i < m; i++){
+            for (int j = 0; j < bs; j++){
+                for (int l = 0; l < k; l++) {
+                    C[i][j+bn*bs] += A[i][l] * B[l][j+bn*bs];
+                }
+            }
+        }   
+    }
+    // right block
+    for (int bm = 0; bm<nbm; bm++){
+        for (int i = 0; i < bs; i++){
+            for (int j = nbn*bs; j < n; j++){
+                for (int l = 0; l < k; l++) {
+                    C[i+bm*bs][j] += A[i+bm*bs][l] * B[l][j];
+                }
+            }
+        }   
+    }
+    // lower right block
+    for (int i = nbm*bs; i < m; i++){
+        for (int j = nbn*bs; j < n; j++){
+            for (int l = 0; l < k; l++) {
+                C[i][j] += A[i][l] * B[l][j];
+            }
+        }
+    }  
+}
