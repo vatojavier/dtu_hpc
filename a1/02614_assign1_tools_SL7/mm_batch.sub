@@ -8,6 +8,7 @@
 #
 #BSUB -J mm_batch
 #BSUB -o mm_batch_%J.out
+#BSUB -e mm_batch_%J.err
 #BSUB -q hpcintro
 #BSUB -n 1
 #BSUB -R "rusage[mem=2048]"
@@ -20,15 +21,16 @@
 # valid values: matmult_c.studio, matmult_f.studio, matmult_c.gcc or
 # matmult_f.gcc
 #
+
 EXECUTABLE=matmult_c.gcc
 
 # define the mkn values in the MKN variable
 #
-SIZES="100 200 500"
+SIZES="10 20 30 40 50 100 150 200 250 300 350 400 450 500 600 700 800 900 1000 1200 1400 1600 1800 2000"
 
 # define the permutation type in PERM
 #
-PERM="mkn"
+PERM="nat"
 
 # uncomment and set a reasonable BLKSIZE for the blk version
 #
