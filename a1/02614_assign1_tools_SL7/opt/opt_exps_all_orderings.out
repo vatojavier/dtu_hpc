@@ -142,3 +142,26 @@
  75937.500    731.348 20 # matmult_mnk
  93750.000    527.632 248 # matmult_mnk
 135000.000    492.585 784 # matmult_mnk
+     9.375   2944.318 0 # matmult_lib
+    21.094   3732.497 0 # matmult_lib
+    28.711   3569.368 0 # matmult_lib
+    37.500   6796.892 0 # matmult_lib
+    58.594   6232.660 0 # matmult_lib
+    84.375   5730.737 0 # matmult_lib
+   114.844   5384.027 0 # matmult_lib
+   189.844   7357.711 0 # matmult_lib
+   234.375   6963.369 0 # matmult_lib
+   258.398   5438.383 0 # matmult_lib
+   283.594   6583.983 0 # matmult_lib
+   337.500   7989.766 0 # matmult_lib
+   527.344   7231.160 0 # matmult_lib
+   937.500   8226.268 0 # matmult_lib
+  3750.000   8409.655 0 # matmult_lib
+ 15000.000   8418.873 0 # matmult_lib
+ 23437.500   8437.578 0 # matmult_lib
+ 28359.375   8432.283 0 # matmult_lib
+ 33750.000   8460.764 0 # matmult_lib
+ 39609.375   8461.249 0 # matmult_lib
+ 45937.500   8469.936 0 # matmult_lib
+ 75937.500   8464.265 0 # matmult_lib
+ 93750.000   8496.073 0 # matmult_lib
