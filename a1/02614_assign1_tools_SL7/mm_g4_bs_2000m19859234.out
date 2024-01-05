@@ -1,0 +1,14 @@
+ 93750.000    786.692 # matmult_blk 10
+ 93750.000    772.541 # matmult_blk 20
+ 93750.000    778.905 # matmult_blk 50
+ 93750.000    766.325 # matmult_blk 75
+ 93750.000    776.048 # matmult_blk 100
+ 93750.000    784.422 # matmult_blk 200
+ 93750.000    781.996 # matmult_blk 300
+ 93750.000    785.320 # matmult_blk 400
+ 93750.000    786.705 # matmult_blk 500
+ 93750.000    784.640 # matmult_blk 600
+ 93750.000    787.192 # matmult_blk 700
+ 93750.000    769.900 # matmult_blk 800
+ 93750.000    786.668 # matmult_blk 900
+ 93750.000    777.448 # matmult_blk 1000
