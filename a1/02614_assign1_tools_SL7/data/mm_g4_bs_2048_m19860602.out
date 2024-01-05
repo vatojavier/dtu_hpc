@@ -1,0 +1,15 @@
+ 98304.000    395.297 # matmult_blk 16
+ 98304.000    360.926 # matmult_blk 20
+ 98304.000    394.726 # matmult_blk 24
+ 98304.000    391.547 # matmult_blk 28
+ 98304.000    382.912 # matmult_blk 32
+ 98304.000    373.823 # matmult_blk 40
+ 98304.000    347.142 # matmult_blk 48
+ 98304.000    387.587 # matmult_blk 56
+ 98304.000    387.741 # matmult_blk 64
+ 98304.000    373.427 # matmult_blk 72
+ 98304.000    381.450 # matmult_blk 96
+ 98304.000    380.430 # matmult_blk 128
+ 98304.000    376.817 # matmult_blk 192
+ 98304.000    370.406 # matmult_blk 256
+ 98304.000    341.063 # matmult_blk 512
