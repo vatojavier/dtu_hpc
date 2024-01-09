@@ -38,7 +38,7 @@ def plot_performance(file_path, out_name):
     ax.set_xlabel("Block footprint (kB)")
     ax.set_ylabel("Mflops/s")
     ax.xaxis.set_major_formatter(ScalarFormatter())
-    ax.set_title("Matrix multiplication performance using blocking")
+    ax.set_title("Matrix multiplication performance using blocking and no optimization")
     ax.legend()
     plt.savefig("data/" + out_name, bbox_inches="tight")
     plt.show()
