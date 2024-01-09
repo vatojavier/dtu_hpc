@@ -41,27 +41,30 @@ int main(int argc, char *argv[])
         output_type = atoi(argv[5]); // ouput type
     }
 
+    // Increment N by two
+    int N2 = N + 2;
+
     // allocate memory
-    if ((u = malloc_3d(N+2, N+2, N+2)) == NULL)
+    if ((u = malloc_3d(N2, N2, N2)) == NULL)
     {
         perror("array u: allocation failed");
         exit(-1);
     }
-    if ((f = malloc_3d(N+2, N+2, N+2)) == NULL){
+    if ((f = malloc_3d(N2, N2, N2)) == NULL){
         perror("array u: allocation failed");
         exit(-1);
     }
 
-    // Initialize conditions
-    for(int i = 0; i < N+2; i++){
-        for(int j = 0; j < N+2; j++){
-            for(int k = 0; k < N+2; k++){
+    // Set boundary conditions
+    for(int i = 0; i < N2; i++){
+        for(int j = 0; j < N2; j++){
+            for(int k = 0; k < N2; k++){
                 u[i][j][k] = start_T;
             }
         }
     }
-    for(int i = 0; i < N+2; i++){
-        for(int j = 0; j < N+2; j++){
+    for(int i = 0; i < N2; i++){
+        for(int j = 0; j < N2; j++){
             u[0][i][j] = 20.0;
             u[N+1][i][j] = 20.0;
             u[i][0][j] = 0.0;
@@ -70,38 +73,21 @@ int main(int argc, char *argv[])
             u[i][j][N+1] = 20.0;
         }
     }
-    for(int i = 0; i < N+2; i++){
-        for(int j = 0; j < N+2; j++){
-            for(int k = 0; k < N+2; k++){
+    // Set source function (radiator)
+    for(int i = 0; i < N2; i++){
+        for(int j = 0; j < N2; j++){
+            for(int k = 0; k < N2; k++){
                 f[i][j][k] = 0.0;
             }
         }
     }
     for(int i = (N+1)/6; i <= (N+1)/2; i++){
-        for(int j = N+1; j >= 3*(N+1)/4; j--){
+        for(int j = 0; j <= (N+1)/4; j++){
             for(int k = 0; k <= 5*(N+1)/16; k++){
                 f[i][j][k] = 200.0;
             }
         }
     }
-    /*
-    for(int i = 0; i < N+2; i++){
-        z = -1.0 + 2.0*(double)i/(N+1);
-        for(int j = 0; j < N+2; j++){
-            y = 1.0 - 2.0*(double)j/(N+1);
-            for(int k = 0; k < N+2; k++){
-                x = -1.0 + 2.0*(double)k/(N+1);
-                if( (x <= -3.0/8.0) && (y <= -1.0/2.0) && (-2.0/3.0 <= z) && (z <= 0.0)){
-                    f[i][j][k] = 200.0;
-                }
-                else{
-                    f[i][j][k] = 0.0;
-                }
-                
-            }
-        }
-    }
-    */
 
 
 
