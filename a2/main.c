@@ -28,6 +28,8 @@ int main(int argc, char *argv[])
     char *output_ext = "";
     char output_filename[FILENAME_MAX];
     double ***u = NULL;
+    double ***f = NULL;
+    double x,y,z;
 
     /* get the paramters from the command line */
     N = atoi(argv[1]);         // grid size
@@ -40,11 +42,68 @@ int main(int argc, char *argv[])
     }
 
     // allocate memory
-    if ((u = malloc_3d(N, N, N)) == NULL)
+    if ((u = malloc_3d(N+2, N+2, N+2)) == NULL)
     {
         perror("array u: allocation failed");
         exit(-1);
     }
+    if ((f = malloc_3d(N+2, N+2, N+2)) == NULL){
+        perror("array u: allocation failed");
+        exit(-1);
+    }
+
+    // Initialize conditions
+    for(int i = 0; i < N+2; i++){
+        for(int j = 0; j < N+2; j++){
+            for(int k = 0; k < N+2; k++){
+                u[i][j][k] = start_T;
+            }
+        }
+    }
+    for(int i = 0; i < N+2; i++){
+        for(int j = 0; j < N+2; j++){
+            u[0][i][j] = 20.0;
+            u[N+1][i][j] = 20.0;
+            u[i][0][j] = 0.0;
+            u[i][N+1][j] = 20.0;
+            u[i][j][0] = 20.0;
+            u[i][j][N+1] = 20.0;
+        }
+    }
+    for(int i = 0; i < N+2; i++){
+        for(int j = 0; j < N+2; j++){
+            for(int k = 0; k < N+2; k++){
+                f[i][j][k] = 0.0;
+            }
+        }
+    }
+    for(int i = (N+1)/6; i <= (N+1)/2; i++){
+        for(int j = N+1; j >= 3*(N+1)/4; j--){
+            for(int k = 0; k <= 5*(N+1)/16; k++){
+                f[i][j][k] = 200.0;
+            }
+        }
+    }
+    /*
+    for(int i = 0; i < N+2; i++){
+        z = -1.0 + 2.0*(double)i/(N+1);
+        for(int j = 0; j < N+2; j++){
+            y = 1.0 - 2.0*(double)j/(N+1);
+            for(int k = 0; k < N+2; k++){
+                x = -1.0 + 2.0*(double)k/(N+1);
+                if( (x <= -3.0/8.0) && (y <= -1.0/2.0) && (-2.0/3.0 <= z) && (z <= 0.0)){
+                    f[i][j][k] = 200.0;
+                }
+                else{
+                    f[i][j][k] = 0.0;
+                }
+                
+            }
+        }
+    }
+    */
+
+
 
     /*
      *
