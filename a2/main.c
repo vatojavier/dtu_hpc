@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     time_start = omp_get_wtime();
     used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
     time_end = omp_get_wtime();
-    printf("%lf %d %d %d %lf %lf JASEQ \n", time_start - time_end, used_iter, iter_max, N, tolerance, start_T);
+    printf("%lf %d %d %d %lf %lf JASEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
 
     // dump  results if wanted
