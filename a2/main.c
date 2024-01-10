@@ -74,15 +74,15 @@ int main(int argc, char *argv[])
     // Call to Jacobi or Gauss-Seidel
     #ifdef _JACOBI
     time_start = omp_get_wtime();
-    if(exp_type == 1){
+
+    switch (exp_type)
+    case 1:
         used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
-    }
-    else if(exp_type == 2){
+    case 2:
         used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
-    }
-    else if(exp_type == 3){
+    case 3:
         used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
-    }
+    
     time_end = omp_get_wtime();
     printf("%lf %d %d %d %lf %lf JASEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
