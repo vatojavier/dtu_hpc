@@ -51,50 +51,24 @@ int main(int argc, char *argv[])
         perror("array u: allocation failed");
         exit(-1);
     }
-    if ((u2 = malloc_3d(N2, N2, N2)) == NULL)
-    {
-        perror("array u: allocation failed");
-        exit(-1);
-    }
     if ((f = malloc_3d(N2, N2, N2)) == NULL){
         perror("array u: allocation failed");
         exit(-1);
     }
 
     // Set boundary conditions
-    for(int i = 0; i < N2; i++){
-        for(int j = 0; j < N2; j++){
-            for(int k = 0; k < N2; k++){
-                u[i][j][k] = start_T;
-            }
-        }
+    #ifdef _JACOBI
+    if ((u2 = malloc_3d(N2, N2, N2)) == NULL)
+    {
+        perror("array u: allocation failed");
+        exit(-1);
     }
-    for(int i = 0; i < N2; i++){
-        for(int j = 0; j < N2; j++){
-            u[0][i][j] = 20.0;
-            u[N+1][i][j] = 20.0;
-            u[i][0][j] = 0.0;
-            u[i][N+1][j] = 20.0;
-            u[i][j][0] = 20.0;
-            u[i][j][N+1] = 20.0;
-        }
-    }
-    // Set source function (radiator)
-    for(int i = 0; i < N2; i++){
-        for(int j = 0; j < N2; j++){
-            for(int k = 0; k < N2; k++){
-                f[i][j][k] = 0.0;
-            }
-        }
-    }
-    for(int i = (N+1)/6; i <= (N+1)/2; i++){
-        for(int j = 0; j <= (N+1)/4; j++){
-            for(int k = 0; k <= 5*(N+1)/16; k++){
-                f[i][j][k] = 200.0;
-            }
-        }
-    }
+    init_jacobi(u, u2, f, N2);
+    #endif
 
+    #ifdef _GAUSS_SEIDEL
+    init_seidel(u, f, N2);
+    #endif
 
 
     /*
@@ -104,7 +78,9 @@ int main(int argc, char *argv[])
      *
      */
 
+    #ifdef _JACOBI
     jacobi(u, u2, f, iter_max, N, tolerance);
+    #endif
 
     // dump  results if wanted
     switch (output_type)
@@ -131,6 +107,9 @@ int main(int argc, char *argv[])
 
     // de-allocate memory
     free_3d(u);
+    #ifdef _JACOBI
+    free_3d(u2);
+    #endif
     free_3d(f);
 
     return (0);
