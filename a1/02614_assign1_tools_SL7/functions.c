@@ -101,10 +101,12 @@ void matmult_blk(int m, int n, int k, double **A, double **B, double **C, int bs
     zeroC(m, n, C);
     for (int bm = 0; bm<m; bm+=bs){
         for (int bn = 0; bn<n; bn+=bs){
-            for (int i = 0; i < MIN(m-bm,bs); i++){
-                for (int j = 0; j < MIN(n-bn,bs); j++){
-                    for (int l = 0; l < k; l++) {
-                        C[i+bm][j+bn] += A[i+bm][l] * B[l][j+bn];
+            for (int bk = 0; bk<k; bk+=bs){
+                for (int i = 0; i < MIN(m-bm,bs); i++){
+                    for (int l = 0; l < MIN(k-bk,bs); l++){
+                        for (int j = 0; j < MIN(n-bn,bs); j++) {
+                            C[i+bm][j+bn] += A[i+bm][l+bk] * B[l+bk][j+bn];
+                        }
                     }
                 }
             }
