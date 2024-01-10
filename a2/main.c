@@ -51,21 +51,30 @@ int main(int argc, char *argv[])
         perror("array u: allocation failed");
         exit(-1);
     }
-    if ((u2 = malloc_3d(N2, N2, N2)) == NULL)
-    {
-        perror("array u: allocation failed");
-        exit(-1);
-    }
     if ((f = malloc_3d(N2, N2, N2)) == NULL){
         perror("array u: allocation failed");
         exit(-1);
     }
 
     // Set boundary conditions
+    #ifdef _JACOBI
+    if ((u2 = malloc_3d(N2, N2, N2)) == NULL)
+    {
+        perror("array u: allocation failed");
+        exit(-1);
+    }
+    init_jacobi(u, u2, f, N2);
+    #endif
+
+    #ifdef _GAUSS_SEIDEL
+    init_seidel(u, f, N2);
+    #endif
+    /*
     for(int i = 0; i < N2; i++){
         for(int j = 0; j < N2; j++){
             for(int k = 0; k < N2; k++){
                 u[i][j][k] = start_T;
+                u2[i][j][k] = start_T;
             }
         }
     }
@@ -77,6 +86,12 @@ int main(int argc, char *argv[])
             u[i][N+1][j] = 20.0;
             u[i][j][0] = 20.0;
             u[i][j][N+1] = 20.0;
+            u2[0][i][j] = 20.0;
+            u2[N+1][i][j] = 20.0;
+            u2[i][0][j] = 0.0;
+            u2[i][N+1][j] = 20.0;
+            u2[i][j][0] = 20.0;
+            u2[i][j][N+1] = 20.0;
         }
     }
     // Set source function (radiator)
@@ -94,6 +109,7 @@ int main(int argc, char *argv[])
             }
         }
     }
+    */
 
 
 
@@ -104,8 +120,10 @@ int main(int argc, char *argv[])
      *
      */
 
+    #ifdef _JACOBI
     jacobi(u, u2, f, iter_max, N, tolerance);
-
+    #endif
+    
     // dump  results if wanted
     switch (output_type)
     {
@@ -131,6 +149,7 @@ int main(int argc, char *argv[])
 
     // de-allocate memory
     free_3d(u);
+    free_3d(u2);
     free_3d(f);
 
     return (0);
