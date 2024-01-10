@@ -75,24 +75,34 @@ int main(int argc, char *argv[])
     #ifdef _JACOBI
     time_start = omp_get_wtime();
 
-    switch (exp_type)
-    case 1:
-        used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
-    case 2:
-        used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
-    case 3:
-        used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
-    
+    switch (exp_type){
+        case 1:
+            used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
+            break;
+        case 2:
+            used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
+            break;
+        case 3:
+            used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+            break;
+    }
     time_end = omp_get_wtime();
     printf("%lf %d %d %d %lf %lf JASEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
 
     #ifdef _GAUSS_SEIDEL
     time_start = omp_get_wtime();
-    used_iter = gauss_seidel(u, f, iter_max, N, tolerance);
+    switch (exp_type){
+        case 1:
+            used_iter = gauss_seidel_seq(u, f, iter_max, N, tolerance);
+            break;
+        case 2:
+            used_iter = gauss_seidel_omp(u, f, iter_max, N, tolerance);
+            break;
+    }
     time_end = omp_get_wtime();
-    // printf("%lf %d %d %d %lf %lf GSEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
-    printf("Time took: %lf\nIterations: %d\nMax iterations: %d\nGrid size: %d\nTolerance: %lf\nStart T: %lf\n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
+    printf("%lf %d %d %d %lf %lf GSEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
+    // printf("Time took: %lf\nIterations: %d\nMax iterations: %d\nGrid size: %d\nTolerance: %lf\nStart T: %lf\n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
 
     // dump  results if wanted
