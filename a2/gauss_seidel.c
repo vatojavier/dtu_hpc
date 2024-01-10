@@ -2,8 +2,9 @@
  *
  */
 #include <math.h>
+#include <stdio.h>
 
-int gauss_seidel(double ***u, double ***f, int max_iter, int N, double tol)
+int gauss_seidel_seq(double ***u, double ***f, int max_iter, int N, double tol)
 {
     // Variables we will use
     double h = 1.0 / 6.0;
@@ -49,6 +50,19 @@ int gauss_seidel(double ***u, double ***f, int max_iter, int N, double tol)
         // Increment iteration counter
         n += 1;
     }
+
+    return n;
+}
+
+
+int gauss_seidel_omp(double ***u, double ***f, int max_iter, int N, double tol){
+    // Variables we will use
+    double h = 1.0 / 6.0;
+    double delta_sq = 4.0 / ((double)N * N + 2 * N + 1);
+    double d = INFINITY;
+    int n = 0;
+
+    printf("Executing GS in parallel\n");
 
     return n;
 }
