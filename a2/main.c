@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
     double tolerance;
     double start_T;
     int used_iter;
+    double time_start, time_end;
     int output_type = 0;
     char *output_prefix = "poisson_res";
     char *output_ext = "";
@@ -80,8 +81,10 @@ int main(int argc, char *argv[])
      */
 
     #ifdef _JACOBI
+    time_start = omp_get_wtime();
     used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
-    printf("%d %d %d %lf %lf JASEQ \n", used_iter, iter_max, N, tolerance, start_T);
+    time_end = omp_get_wtime();
+    printf("%lf %d %d %d %lf %lf JASEQ \n", time_start - time_end, used_iter, iter_max, N, tolerance, start_T);
     #endif
 
     // dump  results if wanted
