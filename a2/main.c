@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "alloc3d.h"
 #include "print.h"
+#include <omp.h>
 
 #ifdef _JACOBI
 #include "jacobi.h"
@@ -23,6 +24,7 @@ int main(int argc, char *argv[])
     int iter_max = 1000;
     double tolerance;
     double start_T;
+    int used_iter;
     int output_type = 0;
     char *output_prefix = "poisson_res";
     char *output_ext = "";
@@ -30,7 +32,6 @@ int main(int argc, char *argv[])
     double ***u = NULL;
     double ***u2 = NULL;
     double ***f = NULL;
-    double x,y,z;
 
     /* get the paramters from the command line */
     N = atoi(argv[1]);         // grid size
@@ -63,11 +64,11 @@ int main(int argc, char *argv[])
         perror("array u: allocation failed");
         exit(-1);
     }
-    init_jacobi(u, u2, f, N2);
+    init_jacobi(u, u2, f, N2, start_T);
     #endif
 
     #ifdef _GAUSS_SEIDEL
-    init_seidel(u, f, N2);
+    init_seidel(u, f, N2, start_T);
     #endif
 
 
@@ -79,7 +80,8 @@ int main(int argc, char *argv[])
      */
 
     #ifdef _JACOBI
-    jacobi(u, u2, f, iter_max, N, tolerance);
+    used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
+    printf("%d %d %d %lf %lf JASEQ \n", used_iter, iter_max, N, tolerance, start_T);
     #endif
 
     // dump  results if wanted
