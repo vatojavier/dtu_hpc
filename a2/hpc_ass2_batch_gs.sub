@@ -6,17 +6,14 @@
 #
 # Author: Bernd Dammann <bd@cc.dtu.dk>
 #
-#BSUB -J g4_JASEQ_no_opt
-#BSUB -o g4_JASEQ_no_opt%J.out
-#BSUB -e g4_JASEQ_no_opt%J.err
+#BSUB -J g4_GSPAR_no_opt
+#BSUB -o g4_GSPAR_no_opt%gs.out
+#BSUB -e g4_GSPAR_no_opt%gs.err
 #BSUB -q hpcintro
 #BSUB -n 24
 #BSUB -N
 #BSUB -R "rusage[mem=2048]"
 #BSUB -W 20
-# uncomment the following line, if you want to assure that your job has
-# a whole CPU for itself (shared L3 cache)
-#BSUB -R "span[hosts=1] affinity[socket(1)]"
 
 # define the executable to use
 # valid values: poisson_j or poisson_gs
