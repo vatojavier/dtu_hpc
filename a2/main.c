@@ -96,10 +96,10 @@ int main(int argc, char *argv[])
             used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
             break;
         case 2:
-            // used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
+            used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
             break;
         case 3:
-            // used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+            used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
             break;
     }
     time_end = omp_get_wtime();
