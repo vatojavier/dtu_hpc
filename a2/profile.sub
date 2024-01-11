@@ -1,3 +1,4 @@
+#!/bin/bash
 # 02614 - High-Performance Computing, January 2024
 # 
 # batch script to run gprofng collect on a dedicated server in the hpcintro
