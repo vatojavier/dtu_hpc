@@ -1,0 +1,49 @@
+# 02614 - High-Performance Computing, January 2024
+# 
+# batch script to run gprofng collect on a dedicated server in the hpcintro
+# queue
+#
+# Author: Your Name <your.email@domain.com>
+#
+#BSUB -J jacobi_collector
+#BSUB -o jacobi_collector_%J.out
+#BSUB -q hpcintro
+#BSUB -n 24
+#BSUB -R "rusage[mem=2048]"
+#BSUB -W 15
+
+
+# needed for the collect tool
+module load gprofng
+
+# define the driver name to use
+# replace with your actual executable name
+EXECUTABLE=poisson_j
+
+# define the max no. of iterations the driver should use - adjust to
+# get a reasonable run time.  You can get an estimate by trying this
+# on the command line, i.e. "MFLOPS_MAX_IT=10 ./jacobi_baseline" for the
+# problem size you want to analyze.
+#
+export MFLOPS_MAX_IT=1000
+export MATMULT_COMPARE=0
+
+# experiment name 
+#
+JID=${LSB_JOBID}
+EXPOUT="$LSB_JOBNAME.${JID}.er"
+
+# uncomment the HWCOUNT line, if you want to use hardware counters
+# define an option string for the hardware counters (see output of
+# 'collect -h' for valid values.  The format is:
+# -h cnt1,on,cnt2,on,...  (up to four counters at a time)
+#
+# the example below is for L1 hits, L1 misses, L2 hits, L2 misses
+#
+HWCOUNT="-h dch,on,dcm,on,l2h,on,l2m,on"
+
+# set the number of threads for OpenMP
+export OMP_NUM_THREADS=24
+
+# start the collect command with the above settings
+gprofng collect app -o $EXPOUT $HWCOUNT ./$EXECUTABLE 200 1000 0.001 0.0 4 3
