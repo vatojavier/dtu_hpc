@@ -3,6 +3,42 @@
  */
 #include <math.h>
 
+
+// // Frobenius norm
+// double norm(double ***old, double ***new, int N){
+// double res = 0.0;
+// int i,j,k = 0;
+// #pragma omp parallel shared(old, new, N) private(i, j, k) reduction(+:res)
+// {
+// #pragma omp for
+// for(int i = 1; i < N+1; i++){
+//     for(int j = 1; j < N+1; j++){
+//         for(int k = 1; k < N+1; k++){
+//             res += (old[i][j][k] - new[i][j][k])*(old[i][j][k] - new[i][j][k]);
+//         }
+//     }
+// }
+// } // End of parallel region
+// return res;
+// }
+
+// Frobenius norm
+// double norm(double ***old, double ***new, int N)
+// {
+// double res = 0.0;
+// int i,j,k = 0;
+// #pragma omp parallel for reduction(+:res)
+// for(int i = 1; i < N+1; i++){
+//     for(int j = 1; j < N+1; j++){
+//         for(int k = 1; k < N+1; k++){
+//             res += (old[i][j][k] - new[i][j][k])*(old[i][j][k] - new[i][j][k]);
+//         }
+//     }
+// }
+// return res;
+// }
+
+
 int
 jacobi(double ***old, double ***new, double ***f, int max_iter, int N, double tol) {
     // Variables we will use
@@ -92,18 +128,17 @@ jacobi_improved(double ***old, double ***new, double ***f, int max_iter, int N, 
     
     int i,j,k = 0;
     // Main loop of jacobi
-
     while(d > tol && n < max_iter)
     {
         d = 0.0;
-        #pragma omp parallel shared(old, new, f, N, h, delta_sq) private(i, j, k) reduction(+:d)
+        #pragma omp parallel shared(old, new, f, N, h, delta_sq) private(i, j, k) reduction(+:d) 
         {
         
         // Compute new 3d matrix
-        #pragma omp for
+        #pragma omp for 
         // #pragma omp for collapse(2)
         // #pragma omp for schedule(static) 
-        // #pragma omp for schedule(dynamic)
+        // #pragma omp for schedule(dynamic, 10)
         // #pragma omp for schedule(guided) 
         // #pragma omp for schedule(runtime)
         for(int i = 1; i < N+1; i++){
@@ -121,6 +156,9 @@ jacobi_improved(double ***old, double ***new, double ***f, int max_iter, int N, 
         temp = old;
         old = new;
         new = temp;
+
+        // // Update convergence
+        // d = norm(old, new, N);
 
         // Increment iteration counter
         n += 1;

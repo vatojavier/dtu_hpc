@@ -42,7 +42,7 @@ void init_jacobi(double ***old, double ***new, double ***f, int N2, double T0){
     // Set boundary conditions
     #pragma omp parallel
     {
-    #pragma omp for schedule(static, 20)
+    #pragma omp for 
     for(int i = 0; i < N2; i++){
         for(int j = 0; j < N2; j++){
             for(int k = 0; k < N2; k++){
@@ -51,7 +51,7 @@ void init_jacobi(double ***old, double ***new, double ***f, int N2, double T0){
             }
         }
     }
-    #pragma omp for schedule(static, 20)
+    #pragma omp for 
     for(int i = 0; i < N2; i++){
         for(int j = 0; j < N2; j++){
             old[0][i][j] = 20.0;
@@ -71,7 +71,7 @@ void init_jacobi(double ***old, double ***new, double ***f, int N2, double T0){
     // } // END PARALLEL
     // #pragma omp parallel
     // {
-    #pragma omp for schedule(static, 20)
+    #pragma omp for 
     // Set source function (radiator)
     for(int i = 0; i < N2; i++){
         for(int j = 0; j < N2; j++){
@@ -80,7 +80,7 @@ void init_jacobi(double ***old, double ***new, double ***f, int N2, double T0){
             }
         }
     }
-    #pragma omp for schedule(static, 20)
+    #pragma omp for 
     for(int i = (N2-1)/6; i <= (N2-1)/2; i++){
         for(int j = 0; j <= (N2-1)/4; j++){
             for(int k = 0; k <= (5*(N2-1))/16; k++){
