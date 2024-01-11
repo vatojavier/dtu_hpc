@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "alloc3d.h"
 #include "print.h"
+#include <omp.h>
 
 #ifdef _JACOBI
 #include "jacobi.h"
@@ -22,26 +23,26 @@ int main(int argc, char *argv[])
     int N = N_DEFAULT;
     int iter_max = 1000;
     double tolerance;
-    double start_T;
-    int output_type = 0;
+    double start_T;     // Starting temperature
+    int used_iter;      // Number of iterations used by function
+    double time_start, time_end;    // Wall clock
+    int output_type = 0;    // store as binary or vtk
+    int exp_type = 0;       // Experiment type
     char *output_prefix = "poisson_res";
     char *output_ext = "";
     char output_filename[FILENAME_MAX];
     double ***u = NULL;
     double ***u2 = NULL;
     double ***f = NULL;
-    double x,y,z;
 
     /* get the paramters from the command line */
     N = atoi(argv[1]);         // grid size
     iter_max = atoi(argv[2]);  // max. no. of iterations
     tolerance = atof(argv[3]); // tolerance
     start_T = atof(argv[4]);   // start T for all inner grid points
-    if (argc == 6)
-    {
-        output_type = atoi(argv[5]); // ouput type
-    }
-
+    output_type = atoi(argv[5]); // ouput type
+    exp_type = atoi(argv[6]); // Experiment type
+    
     // Increment N by two
     int N2 = N + 2;
 
@@ -63,67 +64,47 @@ int main(int argc, char *argv[])
         perror("array u: allocation failed");
         exit(-1);
     }
-    init_jacobi(u, u2, f, N2);
+    init_jacobi(u, u2, f, N2, start_T);
     #endif
 
     #ifdef _GAUSS_SEIDEL
-    init_seidel(u, f, N2);
+    init_seidel(u, f, N2, start_T);
     #endif
-    /*
-    for(int i = 0; i < N2; i++){
-        for(int j = 0; j < N2; j++){
-            for(int k = 0; k < N2; k++){
-                u[i][j][k] = start_T;
-                u2[i][j][k] = start_T;
-            }
-        }
-    }
-    for(int i = 0; i < N2; i++){
-        for(int j = 0; j < N2; j++){
-            u[0][i][j] = 20.0;
-            u[N+1][i][j] = 20.0;
-            u[i][0][j] = 0.0;
-            u[i][N+1][j] = 20.0;
-            u[i][j][0] = 20.0;
-            u[i][j][N+1] = 20.0;
-            u2[0][i][j] = 20.0;
-            u2[N+1][i][j] = 20.0;
-            u2[i][0][j] = 0.0;
-            u2[i][N+1][j] = 20.0;
-            u2[i][j][0] = 20.0;
-            u2[i][j][N+1] = 20.0;
-        }
-    }
-    // Set source function (radiator)
-    for(int i = 0; i < N2; i++){
-        for(int j = 0; j < N2; j++){
-            for(int k = 0; k < N2; k++){
-                f[i][j][k] = 0.0;
-            }
-        }
-    }
-    for(int i = (N+1)/6; i <= (N+1)/2; i++){
-        for(int j = 0; j <= (N+1)/4; j++){
-            for(int k = 0; k <= 5*(N+1)/16; k++){
-                f[i][j][k] = 200.0;
-            }
-        }
-    }
-    */
 
-
-
-    /*
-     *
-     * fill in your code here
-     *
-     *
-     */
-
+    // Call to Jacobi or Gauss-Seidel
     #ifdef _JACOBI
-    jacobi(u, u2, f, iter_max, N, tolerance);
+    time_start = omp_get_wtime();
+
+    switch (exp_type){
+        case 1:
+            used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
+            break;
+        case 2:
+            used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
+            break;
+        case 3:
+            used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+            break;
+    }
+    time_end = omp_get_wtime();
+    printf("%lf %d %d %d %lf %lf JASEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
-    
+
+    #ifdef _GAUSS_SEIDEL
+    time_start = omp_get_wtime();
+    switch (exp_type){
+        case 1:
+            used_iter = gauss_seidel_seq(u, f, iter_max, N, tolerance);
+            break;
+        case 2:
+            used_iter = gauss_seidel_omp(u, f, iter_max, N, tolerance);
+            break;
+    }
+    time_end = omp_get_wtime();
+    printf("%lf %d %d %d %lf %lf GSEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
+    // printf("Time took: %lf\nIterations: %d\nMax iterations: %d\nGrid size: %d\nTolerance: %lf\nStart T: %lf\n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
+    #endif
+
     // dump  results if wanted
     switch (output_type)
     {
@@ -149,7 +130,9 @@ int main(int argc, char *argv[])
 
     // de-allocate memory
     free_3d(u);
+    #ifdef _JACOBI
     free_3d(u2);
+    #endif
     free_3d(f);
 
     return (0);

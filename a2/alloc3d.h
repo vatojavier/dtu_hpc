@@ -3,9 +3,9 @@
 
 double ***malloc_3d(int m, int n, int k);
 
-void init_jacobi(double ***, double ***, double***, int);
+void init_jacobi(double ***, double ***, double***, int, double);
 
-void init_seidel(double ***, double ***, int);
+void init_seidel(double ***, double ***, int, double);
 
 #define HAS_FREE_3D
 void free_3d(double ***array3D);
