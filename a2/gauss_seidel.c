@@ -107,9 +107,6 @@ int gauss_seidel_omp(double ***u, double ***f, int max_iter, int N, double tol)
     
     while (n < max_iter)
     {
-        double d_max = 0.0; // For tracking maximum change in this iteration
-        double sum_of_squares = 0.0;
-
         // #pragma omp parallel for ordered(2) schedule(static,1) shared(delta_sq,u) reduction(+: sum_of_squares)
 
         
