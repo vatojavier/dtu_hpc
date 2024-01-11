@@ -110,8 +110,8 @@ int gauss_seidel_omp(double ***u, double ***f, int max_iter, int N, double tol)
         // #pragma omp parallel for ordered(2) schedule(static,1) shared(delta_sq,u) reduction(+: sum_of_squares)
 
         
-        #pragma omp parallel default(none) shared(N, h, u, f, delta_sq, max_iter, n)
-        #pragma omp for ordered(2)
+        #pragma omp parallel default(none) shared(N, h, u, f, delta_sq, max_iter, n) 
+        #pragma omp for ordered(2) schedule(static,1)
         for (int i = 1; i < N + 1; i++)
         {
             for (int j = 1; j < N + 1; j++)
