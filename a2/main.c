@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
             break;
     }
     time_end = omp_get_wtime();
-    printf("%lf %d %d %d %lf %lf %d JASEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads);
+    printf("%lf %d %d %d %lf %lf %d \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads);
     #endif
 
     #ifdef _GAUSS_SEIDEL

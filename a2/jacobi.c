@@ -52,7 +52,7 @@ jacobi_baseline(double ***old, double ***new, double ***f, int max_iter, int N, 
     // Main loop of jacobi
     while(d > tol && n < max_iter){
         d = 0.0;
-        #pragma omp parallel shared(old, new, f, N, h, delta_sq, d) private(i, j, k) reduction(+:d)
+        #pragma omp parallel shared(old, new, f, N, h, delta_sq) private(i, j, k) reduction(+:d)
         {
         // Compute new 3d matrix
             #pragma omp for
