@@ -138,7 +138,5 @@ int gauss_seidel_omp(double ***u, double ***f, int max_iter, int N, double tol)
         #pragma omp atomic
         n += 1;
     }
-
-    printf("Iterations: %d\n", n);
     return n;
 }
