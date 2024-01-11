@@ -56,9 +56,9 @@ jacobi_baseline(double ***old, double ***new, double ***f, int max_iter, int N, 
         {
         // Compute new 3d matrix
             #pragma omp for
-            for(int i = 1; i < N+1; i++){
-                for(int j = 1; j < N+1; j++){
-                    for(int k = 1; k < N+1; k++){
+            for(i = 1; i < N+1; i++){
+                for(j = 1; j < N+1; j++){
+                    for(k = 1; k < N+1; k++){
                         new[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
                         //Norm
                         d+=(old[i][j][k] - new[i][j][k])*(old[i][j][k] - new[i][j][k]);
@@ -106,9 +106,9 @@ jacobi_improved(double ***old, double ***new, double ***f, int max_iter, int N, 
         // #pragma omp for schedule(dynamic)
         // #pragma omp for schedule(guided) 
         // #pragma omp for schedule(runtime)
-        for(int i = 1; i < N+1; i++){
-            for(int j = 1; j < N+1; j++){
-                for(int k = 1; k < N+1; k++){
+        for(i = 1; i < N+1; i++){
+            for(j = 1; j < N+1; j++){
+                for(k = 1; k < N+1; k++){
                     new[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
                     //Norm
                     d+=(old[i][j][k] - new[i][j][k])*(old[i][j][k] - new[i][j][k]);
