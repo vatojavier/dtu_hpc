@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
     
     // Increment N by two
     int N2 = N + 2;
+    // get the number of threads available to the program
+    int n_threads = omp_get_max_threads();
+    // printf("Number of threads: %d\n", n_threads);
 
     // allocate memory
     if ((u = malloc_3d(N2, N2, N2)) == NULL)
@@ -80,14 +83,15 @@ int main(int argc, char *argv[])
             used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
             break;
         case 2:
-            used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
+            // used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
             break;
         case 3:
-            used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+            // used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
             break;
     }
     time_end = omp_get_wtime();
-    printf("%lf %d %d %d %lf %lf JASEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
+    printf("time iterations max_iter N tolerance start_T n_threads experiment\n");
+    printf("%lf %d %d %d %lf %lf %d JASEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads);
     #endif
 
     #ifdef _GAUSS_SEIDEL
@@ -101,7 +105,8 @@ int main(int argc, char *argv[])
             break;
     }
     time_end = omp_get_wtime();
-    printf("%lf %d %d %d %lf %lf GSEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
+    printf("time iterations max_iter N tolerance start_T n_threads experiment\n");
+    printf("%lf %d %d %d %lf %lf %d GSEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads);
     // printf("Time took: %lf\nIterations: %d\nMax iterations: %d\nGrid size: %d\nTolerance: %lf\nStart T: %lf\n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
 
