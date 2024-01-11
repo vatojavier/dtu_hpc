@@ -6,6 +6,7 @@
 #include "alloc3d.h"
 #include "print.h"
 #include <omp.h>
+#include <string.h>
 
 #ifdef _JACOBI
 #include "jacobi.h"
@@ -35,13 +36,24 @@ int main(int argc, char *argv[])
     double ***u2 = NULL;
     double ***f = NULL;
 
+    char method_name[3];
+
     /* get the paramters from the command line */
     N = atoi(argv[1]);         // grid size
     iter_max = atoi(argv[2]);  // max. no. of iterations
     tolerance = atof(argv[3]); // tolerance
     start_T = atof(argv[4]);   // start T for all inner grid points
     output_type = atoi(argv[5]); // ouput type
+
     exp_type = atoi(argv[6]); // Experiment type
+
+    // char exp_type_str = malloc(strlen(argv[6]) + 1);
+    // if(exp_type_str == NULL){
+    //     perror("exp_type_str: allocation failed");
+    //     exit(-1);
+    // }
+    // strcpy(exp_type_str, argv[6]);
+    
     
     // Increment N by two
     int N2 = N + 2;
@@ -73,6 +85,7 @@ int main(int argc, char *argv[])
 
     // Call to Jacobi or Gauss-Seidel
     #ifdef _JACOBI
+    strcpy(method_name, "ja");
     time_start = omp_get_wtime();
 
     switch (exp_type){
@@ -80,10 +93,10 @@ int main(int argc, char *argv[])
             used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
             break;
         case 2:
-            used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
+            // used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
             break;
         case 3:
-            used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+            // used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
             break;
     }
     time_end = omp_get_wtime();
@@ -91,12 +104,17 @@ int main(int argc, char *argv[])
     #endif
 
     #ifdef _GAUSS_SEIDEL
+    strcpy(method_name, "gs");
+
     time_start = omp_get_wtime();
     switch (exp_type){
         case 1:
             used_iter = gauss_seidel_seq(u, f, iter_max, N, tolerance);
             break;
         case 2:
+            used_iter = gauss_seidel_omp_wrong(u, f, iter_max, N, tolerance);
+            break;
+        case 3:
             used_iter = gauss_seidel_omp(u, f, iter_max, N, tolerance);
             break;
     }
@@ -113,13 +131,13 @@ int main(int argc, char *argv[])
         break;
     case 3:
         output_ext = ".bin";
-        sprintf(output_filename, "%s_%d%s", output_prefix, N, output_ext);
+        sprintf(output_filename, "%s_%s_%d_%d%s", output_prefix, method_name , exp_type , N, output_ext);
         fprintf(stderr, "Write binary dump to %s: ", output_filename);
         print_binary(output_filename, N2, u);
         break;
     case 4:
         output_ext = ".vtk";
-        sprintf(output_filename, "%s_%d%s", output_prefix, N, output_ext);
+        sprintf(output_filename, "%s_%s_%d_%d%s", output_prefix, method_name , exp_type , N, output_ext);
         fprintf(stderr, "Write VTK file to %s: ", output_filename);
         print_vtk(output_filename, N2, u);
         break;
