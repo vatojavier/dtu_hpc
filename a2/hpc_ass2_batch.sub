@@ -6,16 +6,17 @@
 #
 # Author: Bernd Dammann <bd@cc.dtu.dk>
 #
-#BSUB -J g4_batch
-#BSUB -o g4_batch_%J.out
-#BSUB -e g4_batch_%J.err
+#BSUB -J g4_JASEQ_no_opt
+#BSUB -o g4_JASEQ_no_opt%J.out
+#BSUB -e g4_JASEQ_no_opt%J.err
 #BSUB -q hpcintro
 #BSUB -n 24
+#BSUB -N
 #BSUB -R "rusage[mem=2048]"
-#BSUB -W 15
+#BSUB -W 20
 # uncomment the following line, if you want to assure that your job has
 # a whole CPU for itself (shared L3 cache)
-# #BSUB -R "span[hosts=1] affinity[socket(1)]"
+#BSUB -R "span[hosts=1] affinity[socket(1)]"
 
 # define the executable to use
 # valid values: poisson_j or poisson_gs
@@ -25,15 +26,15 @@ EXECUTABLE=poisson_j
 
 # define the resolution values
 #
-RESOLUTION="10 25 50 100 150 200 250 300"
+RESOLUTION="8 10 12 15 20 25 30 40 50 75 100 110 120 135 150"
 
 # define the maximum number of iterations
 #
-MAXIT="20000"
+MAXIT="2000"
 
 # define tolerance
 #
-TOL="0.005"
+TOL="0.000005"
 
 # define starting temperature in the room
 # 
@@ -41,7 +42,7 @@ START_TEMP="0.0"
 
 # define output type
 #
-OUT_TYPE="4"
+OUT_TYPE="0"
 
 # define experiment type: Jacobi: 1-seq, 2-baseline, 3-improved
 #
@@ -50,5 +51,5 @@ EXP_TYPE="1"
 # Start doing an experiment
 for R in $RESOLUTION
 do
-    ./$EXECUTABLE $R $MAXIT $TOL $START_TEMP $OUT_TYPE $EXP_TYPE
+    OMP_NUM_THREADS=1 ./$EXECUTABLE $R $MAXIT $TOL $START_TEMP $OUT_TYPE $EXP_TYPE
 done
