@@ -22,7 +22,7 @@ jacobi(double ***old, double ***new, double ***f, int max_iter, int N, double to
     double ***temp;
     double h = 1.0/6.0;
     double delta_sq = 4.0/((double) N*N+2*N+1);
-    double d = 10000.0;
+    double d = INFINITY;
     int n = 0;
 
     // Main loop of jacobi
