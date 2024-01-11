@@ -9,11 +9,12 @@ jacobi(double ***old, double ***new, double ***f, int max_iter, int N, double to
     double ***temp;
     double h = 1.0/6.0;
     double delta_sq = 4.0/((double) N*N+2*N+1);
-    double d = 10000.0;
+    double d = INFINITY;
     int n = 0;
 
     // Main loop of jacobi
     while(d > tol && n < max_iter){
+        d = 0.0;
         d = 0.0;
         // Compute new 3d matrix
         for(int i = 1; i < N+1; i++){

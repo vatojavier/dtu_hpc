@@ -23,10 +23,11 @@ int main(int argc, char *argv[])
     int N = N_DEFAULT;
     int iter_max = 1000;
     double tolerance;
-    double start_T;
-    int used_iter;
-    double time_start, time_end;
-    int output_type = 0;
+    double start_T;     // Starting temperature
+    int used_iter;      // Number of iterations used by function
+    double time_start, time_end;    // Wall clock
+    int output_type = 0;    // store as binary or vtk
+    int exp_type = 0;       // Experiment type
     char *output_prefix = "poisson_res";
     char *output_ext = "";
     char output_filename[FILENAME_MAX];
@@ -39,13 +40,14 @@ int main(int argc, char *argv[])
     iter_max = atoi(argv[2]);  // max. no. of iterations
     tolerance = atof(argv[3]); // tolerance
     start_T = atof(argv[4]);   // start T for all inner grid points
-    if (argc == 6)
-    {
-        output_type = atoi(argv[5]); // ouput type
-    }
-
+    output_type = atoi(argv[5]); // ouput type
+    exp_type = atoi(argv[6]); // Experiment type
+    
     // Increment N by two
     int N2 = N + 2;
+    // get the number of threads available to the program
+    int n_threads = omp_get_max_threads();
+    // printf("Number of threads: %d\n", n_threads);
 
     // allocate memory
     if ((u = malloc_3d(N2, N2, N2)) == NULL)
@@ -72,19 +74,40 @@ int main(int argc, char *argv[])
     init_seidel(u, f, N2, start_T);
     #endif
 
-
-    /*
-     *
-     * fill in your code here
-     *
-     *
-     */
-
+    // Call to Jacobi or Gauss-Seidel
     #ifdef _JACOBI
     time_start = omp_get_wtime();
-    used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
+
+    switch (exp_type){
+        case 1:
+            used_iter = jacobi(u, u2, f, iter_max, N, tolerance);
+            break;
+        case 2:
+            // used_iter = jacobi_baseline(u, u2, f, iter_max, N, tolerance);
+            break;
+        case 3:
+            // used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+            break;
+    }
     time_end = omp_get_wtime();
-    printf("%lf %d %d %d %lf %lf JASEQ \n", time_start - time_end, used_iter, iter_max, N, tolerance, start_T);
+    printf("time iterations max_iter N tolerance start_T n_threads experiment\n");
+    printf("%lf %d %d %d %lf %lf %d JASEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads);
+    #endif
+
+    #ifdef _GAUSS_SEIDEL
+    time_start = omp_get_wtime();
+    switch (exp_type){
+        case 1:
+            used_iter = gauss_seidel_seq(u, f, iter_max, N, tolerance);
+            break;
+        case 2:
+            used_iter = gauss_seidel_omp(u, f, iter_max, N, tolerance);
+            break;
+    }
+    time_end = omp_get_wtime();
+    printf("time iterations max_iter N tolerance start_T n_threads experiment\n");
+    printf("%lf %d %d %d %lf %lf %d GSEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads);
+    // printf("Time took: %lf\nIterations: %d\nMax iterations: %d\nGrid size: %d\nTolerance: %lf\nStart T: %lf\n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
 
     // dump  results if wanted

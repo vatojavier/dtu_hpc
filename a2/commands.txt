@@ -1,0 +1,2 @@
+grid size, max_iter, tolerance, start temp, output format (0/3/4)
+./poisson_j 300 50 0.01 0 4
