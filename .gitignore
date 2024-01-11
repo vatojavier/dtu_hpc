@@ -2,3 +2,6 @@
 *.o
 *.png
 *.pdf
+/.vscode
+*.vtk
+*.bin
