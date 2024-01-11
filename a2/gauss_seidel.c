@@ -39,13 +39,12 @@ int gauss_seidel_seq(double ***u, double ***f, int max_iter, int N, double tol)
 
                     // Accumulate the squares of the changes
                     double change = u[i][j][k] - old_value;
-                    sum_of_squares += change * change;
+                    // Compute the squared Frobenius norm of the changes
+                    d += change * change;
                 }
             }
         }
 
-        // Compute the Frobenius norm of the changes
-        d = sqrt(sum_of_squares);
 
         // Increment iteration counter
         n += 1;
