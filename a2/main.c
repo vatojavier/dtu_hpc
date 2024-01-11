@@ -108,21 +108,25 @@ int main(int argc, char *argv[])
 
     #ifdef _GAUSS_SEIDEL
     strcpy(method_name, "gs");
+    char seq_par[4];
 
     time_start = omp_get_wtime();
     switch (exp_type){
         case 1:
             used_iter = gauss_seidel_seq(u, f, iter_max, N, tolerance);
+            strcpy(seq_par, "SEQ");
             break;
         case 2:
             used_iter = gauss_seidel_omp_wrong(u, f, iter_max, N, tolerance);
+            strcpy(seq_par, "WRG");
             break;
         case 3:
             used_iter = gauss_seidel_omp(u, f, iter_max, N, tolerance);
+            strcpy(seq_par, "PAR");
             break;
     }
     time_end = omp_get_wtime();
-    printf("%lf %d %d %d %lf %lf %d GSEQ \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads);
+    printf("%lf %d %d %d %lf %lf %d %s%s \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads, method_name, seq_par);
     // printf("Time took: %lf\nIterations: %d\nMax iterations: %d\nGrid size: %d\nTolerance: %lf\nStart T: %lf\n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
 
