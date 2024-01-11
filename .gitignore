@@ -2,6 +2,10 @@
 *.o
 *.png
 *.pdf
-/.vscode
-*.vtk
 *.bin
+.vscode
+a2/poisson_j
+a2/poisson_gs
+a2/poisson_j_OMP
+a2/poisson_gs_OMP
+*.vtk
