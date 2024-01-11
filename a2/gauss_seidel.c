@@ -45,7 +45,7 @@ int gauss_seidel_seq(double ***u, double ***f, int max_iter, int N, double tol){
 }
 
 
-int gauss_seidel_omp(double ***u, double ***f, int max_iter, int N, double tol){
+int gauss_seidel_omp_wrong(double ***u, double ***f, int max_iter, int N, double tol){
      // Variables we will use
     double h = 1.0 / 6.0;
     double delta_sq = 4.0 / ((double)N * N + 2 * N + 1);
@@ -93,5 +93,52 @@ int gauss_seidel_omp(double ***u, double ***f, int max_iter, int N, double tol){
         n += 1;
     }
 
+    return n;
+}
+
+int gauss_seidel_omp(double ***u, double ***f, int max_iter, int N, double tol)
+{
+      // Variables we will use
+    double h = 1.0 / 6.0;
+    double delta_sq = 4.0 / ((double)N * N + 2 * N + 1);
+    int n = 0;
+    int j,k;
+
+    
+    while (n < max_iter)
+    {
+        // #pragma omp parallel for ordered(2) schedule(static,1) shared(delta_sq,u) reduction(+: sum_of_squares)
+
+        
+        #pragma omp parallel default(none) shared(N, h, u, f, delta_sq, max_iter, n) 
+        #pragma omp for ordered(2) schedule(static,1)
+        for (int i = 1; i < N + 1; i++)
+        {
+            for (int j = 1; j < N + 1; j++)
+            {
+                #pragma omp ordered depend(sink:i-1,j) depend(sink:i,j-1)
+                for (int k = 1; k < N + 1; k++)
+                {
+
+                    double old_value = u[i][j][k];
+                    u[i][j][k] = h * (u[i - 1][j][k] +      // Value from the "west"
+                                      u[i + 1][j][k] +      // Value from the "east"
+                                      u[i][j - 1][k] +      // Value from the "south"
+                                      u[i][j + 1][k] +      // Value from the "north"
+                                      u[i][j][k - 1] +      // Value from the "bottom"
+                                      u[i][j][k + 1] +      // Value from the "top"
+                                      delta_sq * f[i][j][k] // Source term
+                                     );
+                }
+                #pragma omp ordered depend(source)  
+            }
+        }
+        // printf("Iteration %d\n", n);
+        // Increment iteration counter
+        #pragma omp atomic
+        n += 1;
+    }
+
+    printf("Iterations: %d\n", n);
     return n;
 }
