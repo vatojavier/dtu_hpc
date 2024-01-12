@@ -35,6 +35,7 @@
 //         }
 //     }
 // }
+// // } // End of parallel region
 // return res;
 // }
 
@@ -119,6 +120,8 @@ jacobi_baseline(double ***old, double ***new, double ***f, int max_iter, int N, 
 
 int
 jacobi_improved(double ***old, double ***new, double ***f, int max_iter, int N, double tol) {
+    
+    
     // Variables we will use
     double ***temp;
     double h = 1.0/6.0;
@@ -128,10 +131,10 @@ jacobi_improved(double ***old, double ***new, double ***f, int max_iter, int N, 
     
     int i,j,k = 0;
     // Main loop of jacobi
-    while(d > tol && n < max_iter)
+    while(d > -INFINITY && n < max_iter)
     {
         d = 0.0;
-        #pragma omp parallel shared(old, new, f, N, h, delta_sq) private(i, j, k) reduction(+:d) 
+        #pragma omp parallel shared(old, new, f, N, h, delta_sq) private(i, j, k) reduction(+:d)
         {
         
         // Compute new 3d matrix
