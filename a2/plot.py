@@ -120,6 +120,7 @@ for exp, file in zip(exps, files):
 
 #%% 
 files = glob.glob('Outputs/jacobi_parallel_baseline/*.out')
+files.append('Outputs/jacobi_improved/g4_JAIMP_NUMA_O319889687_correct.out')
 exps = ['no opt', 'O3']
 
 for exp, file in zip(exps, files):
@@ -141,6 +142,32 @@ for exp, file in zip(exps, files):
     ax.legend(title='n threads')
     plt.savefig(f'figures/jacobi_para_baseline_Mlups_{exp}.pdf', bbox_inches='tight')
     plt.show()
+
+#%% 
+files = glob.glob('Outputs/jacobi_improved/*.out')[2:]
+files.append('Outputs/jacobi_improved/g4_JAIMP_JAIMP_perf_bigN_19889978.out')
+
+df = pd.read_csv(files[0], sep='\s+')
+df2 = pd.read_csv(files[1], sep='\s+')
+df = pd.concat((df,df2[df2.N>df.N.max()]))
+
+fig, ax = plt.subplots(figsize=(10, 6))
+for i, (N_size, grp) in enumerate(df.groupby(['n_threads'])):
+    # if (i + 1) % 2 == 0: #just get every other, since we the plot is already crowded
+    #     continue
+
+    mlups = lattice_updates_per_sec(grp['iterations'],grp['N'], grp['time']) / 1e6
+# Plot
+    ax.semilogx(3*memory_footprint(grp['N']+2), mlups, 'o-', label=f'{N_size[0]}', base=2)
+ax.set_xlabel('Memory footprint (kB)')
+ax.set_ylabel('Mlup/s')
+ax.set_title(f'Improved Parallel Jacobi Mlups ')
+
+ax.vlines([32, 256, 30720], min(mlups), max(mlups), colors='k', linestyles='dashed', label='L1, L2, L3',alpha=0.6)
+ax.xaxis.set_major_formatter(ScalarFormatter())
+ax.legend(title='n threads')
+plt.savefig(f'figures/jacobi_para_improved_large_Mlups.pdf', bbox_inches='tight')
+plt.show()
 # %% figure 4: parallel gauss-seidel
 # same kind of plot as above
 
