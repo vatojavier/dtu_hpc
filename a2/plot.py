@@ -37,7 +37,7 @@ fig, ax = plt.subplots(figsize=(10, 6))
 ax.semilogx(3*memory_footprint(df['N']+2), df['iterations'], 'o-', label='Jacobi', base=2)
 ax.semilogx(2*memory_footprint(df2['N']+2), df2['iterations'], 'o-', label='Gauss-Seidel',base=2)
 
-ax.set_xlabel('N (matrix size) (kB)')
+ax.set_xlabel('Memory footprint (kB)')
 ax.set_ylabel('iterations')
 ax.set_title('Sequential Jacobi vs. Gauss-Seidel iterations till convergence')
 ax.xaxis.set_major_formatter(ScalarFormatter())
@@ -52,7 +52,7 @@ ax.semilogx(2*memory_footprint(df2['N']+2), df2['time'], 'o-', label='Gauss-Seid
 ax.semilogx(2*memory_footprint(df3['N']+2), df3['time'], 'o-', label='Gauss-Seidel (opt)',base=2)
 ax.semilogx(3*memory_footprint(df4['N']+2), df4['time'], 'o-', label='Jacobi (opt)',base=2)
 
-ax.set_xlabel('N (matrix size) (kB)')
+ax.set_xlabel('Memory footprint  (kB)')
 ax.set_ylabel('time (s)')
 ax.set_title('Sequential Jacobi vs. Gauss-Seidel time till convergence')
 ax.xaxis.set_major_formatter(ScalarFormatter())
@@ -71,7 +71,7 @@ ax.semilogx(3*memory_footprint(df['N']+2), mlups[0], 'o-', label='Jacobi', base=
 ax.semilogx(2*memory_footprint(df2['N']+2), mlups[1], 'o-', label='Gauss-Seidel',base=2)
 ax.semilogx(2*memory_footprint(df3['N']+2), mlups[2], 'o-', label='Gauss-seidel (opt)',base=2)
 ax.semilogx(3*memory_footprint(df4['N']+2), mlups[3], 'o-', label='Jacobi (opt)',base=2)
-ax.set_xlabel('N (matrix size) (kB)')
+ax.set_xlabel('Memory footprint (kB)')
 ax.set_ylabel('Mlup/s')
 ax.set_title('Sequential Jacobi & Gauss-Seidel Mlups vs N')
 def flatten(l):
@@ -116,6 +116,30 @@ for exp, file in zip(exps, files):
     ax.legend(title='Grid (N), Parallel fraction (f)')
     ax.grid(axis='y')
     plt.savefig(f'figures/parallel_jacobi_{exp}.pdf', bbox_inches='tight')
+    plt.show()
+
+#%% 
+files = glob.glob('Outputs/jacobi_parallel_baseline/*.out')
+exps = ['no opt', 'O3']
+
+for exp, file in zip(exps, files):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    df = pd.read_csv(file, sep='\s+')
+    for i, (N_size, grp) in enumerate(df.groupby(['n_threads'])):
+        # if (i + 1) % 2 == 0: #just get every other, since we the plot is already crowded
+        #     continue
+
+        mlups = lattice_updates_per_sec(grp['iterations'],grp['N'], grp['time']) / 1e6
+    # Plot
+        ax.semilogx(3*memory_footprint(grp['N']+2), mlups, 'o-', label=f'{N_size[0]}', base=2)
+    ax.set_xlabel('Memory footprint (kB)')
+    ax.set_ylabel('Mlup/s')
+    ax.set_title(f'Baseline Parallel Jacobi Mlups {exp}')
+
+    ax.vlines([32, 256, 30720], min(mlups), max(mlups), colors='k', linestyles='dashed', label='L1, L2, L3',alpha=0.6)
+    ax.xaxis.set_major_formatter(ScalarFormatter())
+    ax.legend(title='n threads')
+    plt.savefig(f'figures/jacobi_para_baseline_Mlups_{exp}.pdf', bbox_inches='tight')
     plt.show()
 # %% figure 4: parallel gauss-seidel
 # same kind of plot as above
