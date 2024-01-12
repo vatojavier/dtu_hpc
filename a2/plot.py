@@ -21,6 +21,8 @@ def amdahls_law(n, p):
 def memory_footprint(N):
     '''memory footprint of 3D matrix in kB'''
     return N**3 * 8 / 1024
+def f_calc(T1, TP, P):
+    return (1-TP/T1)/(1-(1/P))
 
 #%% Plot 1 sequential Jacobi vs. sequential Gauss-Seidel
 # convergence based on threshold
@@ -83,8 +85,6 @@ plt.savefig('figures/sequential_Mlups.pdf', bbox_inches='tight')
 plt.show()
 
 #%% figure 3: parallel jacobi
-def f_calc(T1, TP, P):
-    return (1-TP/T1)/(1-(1/P))
 
 
 files = glob.glob('Outputs/jacobi_parallel_baseline/*.out')
@@ -116,6 +116,39 @@ for exp, file in zip(exps, files):
     ax.legend(title='Grid (N), Parallel fraction (f)')
     ax.grid(axis='y')
     plt.savefig(f'figures/parallel_jacobi_{exp}.pdf', bbox_inches='tight')
+    plt.show()
+
+#%% speedup improved jacobi
+files = glob.glob('Outputs/jacobi_improved/*.out')
+files.pop(1)
+exps = ['Improved no opt', 'Improved, O3']
+for exp, file in zip(exps, files):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(range(1,25),range(1,25), label='1.00')
+    df = pd.read_csv(file, sep='\s+')
+    for i, (N_size, grp) in enumerate(df.groupby(['N'])):
+        if (i + 1) % 2 == 0: #just get every other, since we the plot is already crowded
+            continue
+        T1 = grp['time'].iloc[0]
+        TP = grp['time']
+        P = grp['n_threads']
+        # amdahls law stuff
+        # at all times we have P, T(1) and T(P)
+        # S(P)
+        speedup = T1 / TP
+
+        # compare parallel fraction to the last element
+        f = f_calc(T1, TP, P).iloc[-1]
+
+        # Plot
+        ax.plot(P, speedup, 'o--', label=f'N: {N_size[0]},  f: {round(f,3)}')
+
+    ax.set_xlabel('Processors')
+    ax.set_ylabel('Speed-up')
+    ax.set_title(f'Parallel Jacobi {exp}')
+    ax.legend(title='Grid (N), Parallel fraction (f)')
+    ax.grid(axis='y')
+    plt.savefig(f'figures/parallel_jacobi_improved_{exp}.pdf', bbox_inches='tight')
     plt.show()
 
 #%% 
