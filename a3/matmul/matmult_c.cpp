@@ -1,6 +1,7 @@
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
 #include <omp.h>
+#include<stdio.h>
 
 extern "C" {
     #include <cblas.h>
@@ -19,20 +20,6 @@ extern "C" {
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 C[i][j] = 0.0;
-            }
-        }
-    }
-
-    void matmult_mkn(int m, int n, int k, double **A, double **B, double **C) {
-        zeroC(m, n, C);
-        #pragma omp parallel for 
-        for (int i = 0; i < m; i++) {
-            double sum = 0.0;
-            for (int l = 0; l < k; l++) {
-                for (int j = 0; j < n; j++){
-                    sum += A[i][l] * B[l][j];
-                }
-                C[i][l] = sum;
             }
         }
     }
@@ -100,7 +87,7 @@ extern "C" {
         }
     }
 
-        void matmult_mkn(int m, int n, int k, double **A, double **B, double **C) {
+        void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) {
             zeroC(m, n, C);
             #pragma omp parallel shared(A, B, C) num_threads(24)
             {
@@ -162,12 +149,12 @@ extern "C" {
                 }
                 C[i][j] = sum;
             }
-            // printf("Executed with %d teams and %d threads\n", omp_get_num_teams(), omp_get_num_threads());
+            printf("Executed with %d teams and %d threads\n", omp_get_num_teams(), omp_get_num_threads());
         }
 
         // #pragma omp single
         //     {
-        // printf("Executed with %d teams and %d threads\n", num_teams, num_threads);
+        printf("Executed with %d teams and %d threads\n", num_teams, num_threads);
         //     }
     }
 
