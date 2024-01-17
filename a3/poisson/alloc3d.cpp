@@ -52,9 +52,11 @@ double ***d_malloc_3d(int m, int n, int k, double **data){
 
     // Set the outer array of pointers
     #pragma omp target is_device_ptr(p)
+    {
     for (int i = 0; i < m; i++){
         p[i] = (double **)p + m + i * n;
     }
+    } // End target
 
     // Allocate data vector
     double *a = (double *) omp_target_alloc(m*n*k*sizeof(double), omp_get_default_device());
@@ -64,11 +66,14 @@ double ***d_malloc_3d(int m, int n, int k, double **data){
     }
 
     // Set the inner array of pointers to match data vector
+    #pragma omp target is_device_ptr(p, a)
+    {
     for (int i = 0; i < m; i++){
         for (int j = 0; j < n; j++){
             p[i][j] = a + (i * n * k) + (j * k);
         }
     }
+    } // End target
 
     *data = a;
     return p;

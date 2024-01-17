@@ -76,16 +76,42 @@ int main(int argc, char *argv[])
     init_jacobi(u, u2, f, N2, start_T);
 
     // Here we test d_malloc_3d()
-    double *data;
-    double ***old_dev = d_malloc_3d(N, N, N, &data);
-    omp_target_memcpy(data, u[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
-    #pragma omp target
-    {
-        printf("Hello from device. Value of old_dev[0][0][0] is %lf \n", old_dev[0][0][0]);
+
+    
+    //double *data;
+    //double ***old_dev = d_malloc_3d(N2, N2, N2, &data);
+    //omp_target_memcpy(data, u[0][0], N2*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    //#pragma omp target
+    //{
+    //    printf("Hello from device. Value of old_dev[0][0][0] is %lf \n", old_dev[0][0][0]);
+    //    printf("Also the value of old_dev[2][0][2] is %lf \n", old_dev[2][0][2]);
+    //}
+    
+    printf("Now it is the host speaking. We will run the three jacobi functions. \n");    
+
+    used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+    if(N < 10){
+        printf("We print the output of the third slice: \n");
+        for(int i = 0; i < N2; i++){
+            for(int j = 0; j < N2; j++){
+                printf("%lf ", u[2][i][j]);
+            }
+            printf("\n");
+        }
     }
 
-    // used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
-    // used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
+    init_jacobi(u, u2, f, N2, start_T);
+
+    used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
+    if(N < 10){
+        printf("We print the output of the third slice: \n");
+        for(int i = 0; i < N2; i++){
+            for(int j = 0; j < N2; j++){
+                printf("%lf ", u[2][i][j]);
+            }
+            printf("\n");
+        }
+    }
     // used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
 
 
@@ -164,7 +190,7 @@ int main(int argc, char *argv[])
     free_3d(u);
     free_3d(u2);
     free_3d(f);
-    d_free_3d(old_dev, data);
+    //d_free_3d(old_dev, data);
 
     return (0);
 }

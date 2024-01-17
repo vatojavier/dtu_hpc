@@ -61,27 +61,46 @@ extern "C" {
         cublasDestroy(handle);
         }
 
-    // void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
-    //     #define BLK 200
-    //     #pragma omp target teams distribute parallel for num_teams(2) thread_limit(3) \
-    //     map(tofrom: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n])
-    //     for (int i = 0; i < m; i += BLK) { 
-    //         for (int j = 0; j < n; ++j) { 
-    //             if (i + BLK - 1 < m) { 
-    //                 double sum[BLK] = {0}; 
-    //                 // Do BLK elements of C here
-    //                 C[i][j] = 
-                    
-    //             } else { 
-    //                 // Do the remainder part here 
+    void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
+        // Seems like the block size should be lower than 4, otherwise we cannot completely unroll the loops
+        #define BLK 4
 
-    //         }
-    //     }
-    // }
-    // }
-     
-        void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) 
-        {
+        zeroC(m, n, C);
+
+        #pragma omp target teams loop num_teams(m/16) thread_limit(16) \
+        map(tofrom: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n]) collapse(2)
+        for (int i = 0; i < m; i += BLK) { 
+            for (int j = 0; j < n; ++j) { 
+                if (i + BLK - 1 < m) { 
+                    double sum[BLK] = {0}; 
+                    // Do BLK elements of C here
+                    for (int l = 0; l < k; l++) { 
+                        for (int ii = 0; ii < BLK; ii++) { 
+                            sum[ii] += A[i + ii][l] * B[l][j]; 
+                        } 
+                    }
+
+                    for (int ii = 0; ii < BLK; ii++) { 
+                        C[i + ii][j] = sum[ii]; 
+                    }
+                    
+                } else { 
+                    // Do the remainder part here 
+                    double sum[BLK] = {0}; 
+                    for (int l = 0; l < k; l++) { 
+                        for (int ii = i; ii < m; ii++) { 
+                            sum[ii-i] += A[ii][l] * B[l][j]; 
+                        }
+                    }
+                    for (int ii = i; ii < m; ii++) { 
+                        C[ii][j] += sum[ii-i]; 
+                    }
+                }
+            }
+        }
+    }
+
+        void matmult_mkn(int m, int n, int k, double **A, double **B, double **C) {
             zeroC(m, n, C);
             #pragma omp parallel shared(A, B, C) num_threads(24)
             {
