@@ -23,7 +23,7 @@ extern "C" {
         }
     }
 
-    void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) {
+    void matmult_mkn(int m, int n, int k, double **A, double **B, double **C) {
         zeroC(m, n, C);
         #pragma omp parallel for 
         for (int i = 0; i < m; i++) {
@@ -61,26 +61,27 @@ extern "C" {
         cublasDestroy(handle);
         }
 
-    void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
-        #define BLK 200
-
-        #pragma omp target teams distribute parallel for num_teams(2) thread_limit(3) \
-        map(tofrom: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n])
-        for (int i = 0; i < m; i += BLK) { 
-            for (int j = 0; j < n; ++j) { 
-                if (i + BLK - 1 < m) { 
-                    double sum[BLK] = {0}; 
-                    // Do BLK elements of C here
-                    C[i][j] = 
+    // void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
+    //     #define BLK 200
+    //     #pragma omp target teams distribute parallel for num_teams(2) thread_limit(3) \
+    //     map(tofrom: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n])
+    //     for (int i = 0; i < m; i += BLK) { 
+    //         for (int j = 0; j < n; ++j) { 
+    //             if (i + BLK - 1 < m) { 
+    //                 double sum[BLK] = {0}; 
+    //                 // Do BLK elements of C here
+    //                 C[i][j] = 
                     
-                } else { 
-                    // Do the remainder part here 
+    //             } else { 
+    //                 // Do the remainder part here 
 
-            }
-        }
-    }
-
-        void matmult_mkn(int m, int n, int k, double **A, double **B, double **C) {
+    //         }
+    //     }
+    // }
+    // }
+     
+        void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) 
+        {
             zeroC(m, n, C);
             #pragma omp parallel shared(A, B, C) num_threads(24)
             {
@@ -96,22 +97,22 @@ extern "C" {
             } // end of parallel region
         }
 
-        void matmult_mkn_offload(int m, int n, int k, double **A, double **B, double **C) {
+        void matmult_mkn_offload(int m, int n, int k, double **A, double **B, double **C) 
+        {
             zeroC(m, n, C);
-            #pragma omp target parallel for //map(to:A[0:m][0:n], B[0:m][0:n],C[0:m][0:n]) map(from:C[0:m][0:n])
-            
+            int num_teams = 4;
+            int num_threads = 64;
+            #pragma omp target teams distribute parallel for map(to: A[0:m][0:k], B[0:k][0:n]) map(tofrom: C[0:m][0:n]) num_teams(num_teams) thread_limit(num_threads)
             for (int i = 0; i < m; i++) {
-                for (int l = 0; l < k; l++) {
-                    for (int j = 0; j < n; j++) {
-                        C[i][j] += A[i][l] * B[l][j];
-                    }
+            for (int l = 0; l < k; l++) {
+            for (int j = 0; j < n; j++) {
+                C[i][j] += A[i][l] * B[l][j];
                 }
             }
-            // } // end of parallel region
         }
-
-        
-}
+    }
+       
+} // end of extern "C"
 
 // KEEP EVERYTHING YOU WANT TO RUN IN THE BRACKETS ABOVE
 
