@@ -61,6 +61,24 @@ extern "C" {
         cublasDestroy(handle);
         }
 
+    void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
+        #define BLK 200
+
+        #pragma omp target teams distribute parallel for num_teams(2) thread_limit(3) \
+        map(tofrom: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n])
+        for (int i = 0; i < m; i += BLK) { 
+            for (int j = 0; j < n; ++j) { 
+                if (i + BLK - 1 < m) { 
+                    double sum[BLK] = {0}; 
+                    // Do BLK elements of C here
+                    C[i][j] = 
+                    
+                } else { 
+                    // Do the remainder part here 
+
+            }
+        }
+    }
 
         void matmult_mkn(int m, int n, int k, double **A, double **B, double **C) {
             zeroC(m, n, C);
