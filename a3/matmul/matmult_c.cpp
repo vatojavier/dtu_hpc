@@ -130,6 +130,47 @@ extern "C" {
             }
         }
     }
+
+    void matmult_mnk(int m, int n, int k, double **A, double **B, double **C) {
+        zeroC(m, n, C);
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++){
+                for (int l = 0; l < k; l++) {
+                    C[i][j] += A[i][l] * B[l][j];
+                }
+            }
+        }
+    }
+
+    void matmult_mnk_offload(int m, int n, int k, double **A, double **B, double **C) {
+        zeroC(m, n, C);
+
+        // int num_teams = 4; // 4 to 500: 4, 16, 64, 200, 500
+        // int num_threads = 256; // 64 to 512: 64, 128, 256, 512
+
+        int num_teams = omp_get_num_teams(); 
+        int num_threads = omp_get_num_threads();
+
+        #pragma omp target teams distribute parallel for map(to: A[0:m][0:k], B[0:k][0:n]) map(from: C[0:m][0:n]) \
+        num_teams(num_teams) thread_limit(num_threads)
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                double sum = 0.0;
+                for (int l = 0; l < k; l++) {
+                    sum += A[i][l] * B[l][j];
+                }
+                C[i][j] = sum;
+            }
+            // printf("Executed with %d teams and %d threads\n", omp_get_num_teams(), omp_get_num_threads());
+        }
+
+        // #pragma omp single
+        //     {
+        // printf("Executed with %d teams and %d threads\n", num_teams, num_threads);
+        //     }
+    }
+
        
 } // end of extern "C"
 
