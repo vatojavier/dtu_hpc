@@ -102,6 +102,19 @@ int main(int argc, char *argv[])
 
     init_jacobi(u, u2, f, N2, start_T);
 
+    used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
+    if(N < 10){
+        printf("We print the output of the third slice: \n");
+        for(int i = 0; i < N2; i++){
+            for(int j = 0; j < N2; j++){
+                printf("%lf ", u[2][i][j]);
+            }
+            printf("\n");
+        }
+    }
+    
+    init_jacobi(u, u2, f, N2, start_T);
+
     used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
     if(N < 10){
         printf("We print the output of the third slice: \n");
@@ -112,7 +125,6 @@ int main(int argc, char *argv[])
             printf("\n");
         }
     }
-    // used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
 
 
     // Call to Jacobi or Gauss-Seidel

@@ -138,8 +138,8 @@ jacobi_improved(double ***old, double ***newVol, double ***f, int max_iter, int 
     while(n < max_iter)
     {
         // d = 0.0;
-        #pragma omp parallel shared(old, newVol, f, N, h, delta_sq) private(i, j, k)
-        {
+        //#pragma omp parallel shared(old, newVol, f, N, h, delta_sq) private(i, j, k)
+        //{
         
         // Compute newVol 3d matrix
         #pragma omp for
@@ -152,7 +152,7 @@ jacobi_improved(double ***old, double ***newVol, double ***f, int max_iter, int 
                 }
             }
         } 
-        } // End of parallel region
+        //} // End of parallel region
 
         // Switch pointers
         temp = old;
@@ -183,12 +183,12 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
     int i,j,k = 0;
 
     // Data transfer using map clause
-    #pragma omp target enter data map(to: old[:N2][:N2][:N2]) map(to: f[:N2][:N2][:N2]) map(alloc: newVol[:N2][:N2][:N2])
+    #pragma omp target enter data map(to: old[:N2][:N2][:N2]) map(to: f[:N2][:N2][:N2]) map(to: newVol[:N2][:N2][:N2])
 
     // Main loop of jacobi
     while(n < max_iter){
         // d = 0.0;
-        #pragma omp target teams distribute parallel for shared(h, N, delta_sq)
+        #pragma omp target teams distribute parallel for shared(h, N, delta_sq) collapse(2)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
@@ -243,6 +243,7 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
     // Data transfer using memcopy
     omp_target_memcpy(data, old[0][0], (N+2)*(N+2)*(N+2)*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     omp_target_memcpy(data_f, f[0][0], (N+2)*(N+2)*(N+2)*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    omp_target_memcpy(data_new, newVol[0][0], (N+2)*(N+2)*(N+2)*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
 
     // Main loop of jacobi
     while(n < max_iter){
