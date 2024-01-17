@@ -286,3 +286,52 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
     
     return n;
 }
+
+int
+jacobi_offload_norm(double ***old, double ***newVol, double ***f, int max_iter, int N, double tol){
+   
+    // Variables we will use
+    int N2 = N+2;
+    double ***temp;
+    double h = 1.0/6.0;
+    double delta_sq = 4.0/((double) N*N+2*N+1);
+    double d = 10000.0;
+    int n = 0;
+    int i,j,k = 0;
+
+    // Data transfer using map clause
+    #pragma omp target enter data map(to: old[:N2][:N2][:N2]) map(to: f[:N2][:N2][:N2]) map(to: newVol[:N2][:N2][:N2])
+
+    // Main loop of jacobi
+    while(d > tol && n < max_iter){
+        d = 0.0;
+        #pragma omp target teams distribute parallel for shared(h, N, delta_sq) reduction(+: d)
+        for(i = 1; i < N+1; i++){
+            for(j = 1; j < N+1; j++){
+                for(k = 1; k < N+1; k++){
+                    newVol[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
+                    //Norm
+                    d+=(old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
+                }
+            }
+        }
+
+        // Switch pointers
+        temp = old;
+        old = newVol;
+        newVol = temp;
+
+        // // Update convergence
+        // d = norm(old, newVol, N);
+
+        // Increment iteration counter
+        n += 1;
+
+    }
+
+    // Data transfer to host
+    #pragma omp target exit data map(from: old[:N2][:N2][:N2]) map(release: f[:N2][:N2][:N2]) map(release: newVol[:N2][:N2][:N2])
+    #pragma omp target exit data map(release: old[:N2][:N2][:N2])
+    
+    return n;
+}
