@@ -88,8 +88,11 @@ int main(int argc, char *argv[])
     //}
     
     printf("Now it is the host speaking. We will run the three jacobi functions. \n");    
-
+    time_start = omp_get_wtime();
     used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+    time_end = omp_get_wtime();
+    printf("%d %lf CPU \n", N, time_end - time_start);
+    //printf("Sanity check: %lf \n", u[50][50][50]);
     if(N < 10){
         printf("We print the output of the third slice: \n");
         for(int i = 0; i < N2; i++){
@@ -102,7 +105,13 @@ int main(int argc, char *argv[])
 
     init_jacobi(u, u2, f, N2, start_T);
 
+    time_start = omp_get_wtime();
     used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
+    time_end = omp_get_wtime();
+    printf("%d %lf GPUMAP \n", N, time_end - time_start);
+    //printf("Sanity check: %lf \n", u[50][50][50]);
+
+
     if(N < 10){
         printf("We print the output of the third slice: \n");
         for(int i = 0; i < N2; i++){
@@ -112,10 +121,15 @@ int main(int argc, char *argv[])
             printf("\n");
         }
     }
-    
+
     init_jacobi(u, u2, f, N2, start_T);
 
+    time_start = omp_get_wtime();
     used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
+    time_end = omp_get_wtime();
+    printf("%d %lf GPUCPY \n", N, time_end - time_start);
+    printf("Sanity check: %lf \n", u[50][50][50]);
+
     if(N < 10){
         printf("We print the output of the third slice: \n");
         for(int i = 0; i < N2; i++){
@@ -125,6 +139,14 @@ int main(int argc, char *argv[])
             printf("\n");
         }
     }
+
+    init_jacobi(u, u2, f, N2, start_T);
+
+    time_start = omp_get_wtime();
+    used_iter = jacobi_offload_norm(u, u2, f, iter_max, N, tolerance);
+    time_end = omp_get_wtime();
+    printf("%d %lf GPUCPY \n", N, time_end - time_start);
+    printf("Sanity check: %lf \n", u[50][50][50]);
 
 
     // Call to Jacobi or Gauss-Seidel
