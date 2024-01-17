@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "alloc3d.h"
 #include "print.h"
+#include "init.h"
 #include <omp.h>
 #include <string.h>
 #include "jacobi.h"
@@ -74,8 +75,16 @@ int main(int argc, char *argv[])
     // Set boundary conditions
     init_jacobi(u, u2, f, N2, start_T);
 
+    // Here we test d_malloc_3d()
+
+
+    // used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+    // used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
+    // used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
+
 
     // Call to Jacobi or Gauss-Seidel
+    /*
     #ifdef _JACOBI
     strcpy(method_name, "ja");
     time_start = omp_get_wtime();
@@ -94,7 +103,9 @@ int main(int argc, char *argv[])
     time_end = omp_get_wtime();
     printf("%lf %d %d %d %lf %lf %d \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads);
     #endif
+    */
 
+    /* GAUSS-SEIDEL
     #ifdef _GAUSS_SEIDEL
     strcpy(method_name, "gs");
     char seq_par[4];
@@ -118,6 +129,7 @@ int main(int argc, char *argv[])
     printf("%lf %d %d %d %lf %lf %d %s%s \n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T, n_threads, method_name, seq_par);
     // printf("Time took: %lf\nIterations: %d\nMax iterations: %d\nGrid size: %d\nTolerance: %lf\nStart T: %lf\n", time_end - time_start, used_iter, iter_max, N, tolerance, start_T);
     #endif
+    */
 
     // dump  results if wanted
     switch (output_type)

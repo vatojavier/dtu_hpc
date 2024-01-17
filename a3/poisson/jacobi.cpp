@@ -2,6 +2,7 @@
  * 
  */
 #include <math.h>
+#include "alloc3d.h"
 
 
 // // Frobenius norm
@@ -140,12 +141,7 @@ jacobi_improved(double ***old, double ***newVol, double ***f, int max_iter, int 
         {
         
         // Compute newVol 3d matrix
-        #pragma omp for 
-        // #pragma omp for collapse(2)
-        // #pragma omp for schedule(static) 
-        // #pragma omp for schedule(dynamic, 10)
-        // #pragma omp for schedule(guided) 
-        // #pragma omp for schedule(runtime)
+        #pragma omp for
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
@@ -201,10 +197,14 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
             }
         }
 
+        #pragma omp target update map(from: old[:N][:N][:N]) map(from: newVol[:N][:N][:N])
+
         // Switch pointers
         temp = old;
         old = newVol;
         newVol = temp;
+
+        #pragma omp target update map(to: old[:N][:N][:N]) map(to: newVol[:N][:N][:N])
 
         // // Update convergence
         // d = norm(old, newVol, N);
@@ -216,6 +216,68 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
 
     // Data transfer to host
     #pragma omp target exit data map(from: old[:N][:N][:N]) map(release: f[:N][:N][:N]) map(release: newVol[:N][:N][:N])
+    
+    return n;
+}
+
+
+int
+jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_iter, int N, double tol){
+   
+    // Variables we will use
+    double ***temp;
+    double *temp2;
+    double h = 1.0/6.0;
+    double delta_sq = 4.0/((double) N*N+2*N+1);
+    // double d = 10000.0;
+    int n = 0;
+    int i,j,k = 0;
+
+    // Allocate memory on device
+    double *data;
+    double *data_f;
+    double *data_new;
+    double ***old_dev = d_malloc_3d(N, N, N, &data);
+    double ***f_dev = d_malloc_3d(N, N, N, &data_f);
+    double ***new_dev = d_malloc_3d(N, N, N, &data_new);
+
+    // Data transfer using memcopy
+    omp_target_memcpy(data, old[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    omp_target_memcpy(data_f, f[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+
+    // Main loop of jacobi
+    while(n < max_iter){
+        // d = 0.0;
+        #pragma omp target teams distribute parallel for
+        for(i = 1; i < N+1; i++){
+            for(j = 1; j < N+1; j++){
+                for(k = 1; k < N+1; k++){
+                    newVol[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
+                    //Norm
+                    // d+=(old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
+                }
+            }
+        }
+
+        // Switch device pointers (the host does this)
+        temp = old_dev;
+        old = new_dev;
+        new_dev = temp;
+
+        temp2 = data;
+        data = data_new;
+        data_new = temp2;
+
+        // // Update convergence
+        // d = norm(old, newVol, N);
+
+        // Increment iteration counter
+        n += 1;
+
+    }
+
+    // Data transfer to host
+    omp_target_memcpy(old[0][0], data, N*N*N*sizeof(double), 0, 0, omp_get_initial_device(), omp_get_default_device());
     
     return n;
 }
