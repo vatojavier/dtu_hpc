@@ -134,9 +134,12 @@ extern "C" {
 
         // int num_teams = 4; // 4 to 500: 4, 16, 64, 200, 500
         // int num_threads = 256; // 64 to 512: 64, 128, 256, 512
+        char *env_num_teams = getenv("NUM_TEAMS");
+        char *env_num_threads = getenv("NUM_THREADS");
 
-        int num_teams = omp_get_num_teams(); 
-        int num_threads = omp_get_num_threads();
+        int num_teams = (env_num_teams != NULL) ? atoi(env_num_teams) : 4; // default value if not set
+        int num_threads = (env_num_threads != NULL) ? atoi(env_num_threads) : 256; // default value if not set
+
 
         #pragma omp target teams distribute parallel for map(to: A[0:m][0:k], B[0:k][0:n]) map(from: C[0:m][0:n]) \
         num_teams(num_teams) thread_limit(num_threads)
@@ -149,12 +152,12 @@ extern "C" {
                 }
                 C[i][j] = sum;
             }
-            printf("Executed with %d teams and %d threads\n", omp_get_num_teams(), omp_get_num_threads());
+            // printf("Executed with %d teams and %d threads\n", omp_get_num_teams(), omp_get_num_threads());
         }
 
         // #pragma omp single
         //     {
-        printf("Executed with %d teams and %d threads\n", num_teams, num_threads);
+        // printf("Executed with %d teams and %d threads\n", num_teams, num_threads);
         //     }
     }
 
