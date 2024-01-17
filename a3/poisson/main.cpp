@@ -76,7 +76,13 @@ int main(int argc, char *argv[])
     init_jacobi(u, u2, f, N2, start_T);
 
     // Here we test d_malloc_3d()
-
+    double *data;
+    double ***old_dev = d_malloc_3d(N, N, N, &data);
+    omp_target_memcpy(data, u[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    #pragma omp target
+    {
+        printf("Hello from device. Value of old_dev[0][0][0] is %lf \n", old_dev[0][0][0]);
+    }
 
     // used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
     // used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
@@ -158,6 +164,7 @@ int main(int argc, char *argv[])
     free_3d(u);
     free_3d(u2);
     free_3d(f);
+    d_free_3d(old_dev, data);
 
     return (0);
 }
