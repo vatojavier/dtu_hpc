@@ -1,0 +1,267 @@
+==PROF== Connected to process 3806994 (/zhome/c6/d/138382/IntroHPC/dtu_hpc/a3/poisson/poisson)
+==PROF== Profiling "nvkernel__Z11d_malloc_3diiiPP..." - 0: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z11d_malloc_3diiiPP..." - 1: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z11d_malloc_3diiiPP..." - 2: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z11d_malloc_3diiiPP..." - 3: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z11d_malloc_3diiiPP..." - 4: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z11d_malloc_3diiiPP..." - 5: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 6: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 7: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 8: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 9: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 10: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 11: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 12: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 13: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 14: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 15: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 16: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 17: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 18: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 19: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 20: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 21: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 22: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 23: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 24: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 25: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 26: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 27: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 28: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 29: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 30: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 31: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 32: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 33: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 34: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 35: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 36: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 37: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 38: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 39: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 40: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 41: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 42: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 43: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 44: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 45: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 46: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 47: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 48: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 49: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 50: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 51: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 52: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 53: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 54: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 55: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 56: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 57: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 58: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 59: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 60: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 61: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 62: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 63: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 64: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 65: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 66: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 67: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 68: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 69: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 70: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 71: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 72: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 73: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 74: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 75: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 76: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 77: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 78: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 79: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 80: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 81: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 82: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 83: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 84: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 85: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 86: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 87: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 88: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 89: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 90: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 91: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 92: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 93: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 94: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 95: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 96: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 97: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 98: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 99: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 100: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 101: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 102: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 103: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 104: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 105: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 106: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 107: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 108: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 109: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 110: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 111: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 112: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 113: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 114: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 115: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 116: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 117: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 118: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 119: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 120: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 121: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 122: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 123: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 124: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 125: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 126: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 127: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 128: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 129: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 130: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 131: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 132: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 133: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 134: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 135: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 136: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 137: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 138: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 139: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 140: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 141: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 142: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 143: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 144: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 145: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 146: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 147: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 148: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 149: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 150: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 151: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 152: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 153: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 154: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 155: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 156: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 157: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 158: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 159: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 160: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 161: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 162: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 163: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 164: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 165: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 166: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 167: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 168: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 169: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 170: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 171: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 172: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 173: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 174: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 175: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 176: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 177: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 178: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 179: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 180: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 181: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 182: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 183: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 184: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 185: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 186: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 187: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 188: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 189: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 190: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 191: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 192: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 193: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 194: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 195: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 196: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 197: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 198: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 199: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 200: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 201: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 202: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 203: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 204: 0%....50%....100% - 21 passes
+==PROF== Profiling "nvkernel__Z22jacobi_offload_m..." - 205: 0%....50%....100% - 21 passes
+100 350.732696 GPUCPY 
+Sanity check: 0.000002 
+==PROF== Disconnected from process 3806994
+==PROF== Report: /zhome/c6/d/138382/IntroHPC/dtu_hpc/a3/poisson/profile_19916010.ncu-rep
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 19916010: <proftest> in cluster <dcc> Done
+
+Job <proftest> was submitted from host <n-62-11-46> by user <s184010> in cluster <dcc> at Wed Jan 17 16:29:02 2024
+Job was executed on host(s) <4*n-62-12-81>, in queue <hpcintrogpu>, as user <s184010> in cluster <dcc> at Wed Jan 17 16:29:02 2024
+</zhome/c6/d/138382> was used as the home directory.
+</zhome/c6/d/138382/IntroHPC/dtu_hpc/a3/poisson> was used as the working directory.
+Started at Wed Jan 17 16:29:02 2024
+Terminated at Wed Jan 17 16:34:57 2024
+Results reported at Wed Jan 17 16:34:57 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/sh
+#BSUB -J proftest
+#BSUB -q hpcintrogpu
+#BSUB -n 4
+#BSUB -R "span[hosts=1]" 
+#BSUB -gpu "num=1:mode=exclusive_process" 
+#BSUB -W 10
+#BSUB -R "rusage[mem=2048]" 
+
+export TMPDIR=$__LSF_JOB_TMPDIR__
+
+module load /appl9/nvhpc/2023_2311/modulefiles/nvhpc-nompi/23.11
+
+export MFLOPS_MAX_IT=1 
+
+ncu -o profile_$LSB_JOBID \
+ --section MemoryWorkloadAnalysis \
+ --section MemoryWorkloadAnalysis_Chart \
+ --section ComputeWorkloadAnalysis \
+./poisson 100 200 0.0005 0.0 0
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   539.00 sec.
+    Max Memory :                                 316 MB
+    Average Memory :                             313.60 MB
+    Total Requested Memory :                     8192.00 MB
+    Delta Memory :                               7876.00 MB
+    Max Swap :                                   -
+    Max Processes :                              7
+    Max Threads :                                20
+    Run time :                                   410 sec.
+    Turnaround time :                            355 sec.
+
+The output (if any) is above this job summary.
+
