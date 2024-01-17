@@ -3,6 +3,7 @@
  */
 #include <math.h>
 #include "alloc3d.h"
+#include <omp.h>
 
 
 // // Frobenius norm
@@ -187,7 +188,7 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
     // Main loop of jacobi
     while(n < max_iter){
         // d = 0.0;
-        #pragma omp target teams distribute parallel for
+        #pragma omp target teams distribute parallel for shared(h, N, delta_sq)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
@@ -213,6 +214,7 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
 
     // Data transfer to host
     #pragma omp target exit data map(from: old[:N2][:N2][:N2]) map(release: f[:N2][:N2][:N2]) map(release: newVol[:N2][:N2][:N2])
+    #pragma omp target exit data map(release: old[:N2][:N2][:N2])
     
     return n;
 }
@@ -245,11 +247,11 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
     // Main loop of jacobi
     while(n < max_iter){
         // d = 0.0;
-        #pragma omp target teams distribute parallel for
+        #pragma omp target teams distribute parallel for shared(h, delta_sq, N)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
-                    newVol[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
+                    new_dev[i][j][k] = h*(old_dev[i-1][j][k] + old_dev[i+1][j][k] + old_dev[i][j-1][k] + old_dev[i][j+1][k] + old_dev[i][j][k-1] + old_dev[i][j][k+1] + delta_sq*f_dev[i][j][k]);
                     //Norm
                     // d+=(old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
                 }
@@ -258,7 +260,7 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
 
         // Switch device pointers (the host does this)
         temp = old_dev;
-        old = new_dev;
+        old_dev = new_dev;
         new_dev = temp;
 
         temp2 = data;
@@ -275,6 +277,11 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
 
     // Data transfer to host
     omp_target_memcpy(old[0][0], data, (N+2)*(N+2)*(N+2)*sizeof(double), 0, 0, omp_get_initial_device(), omp_get_default_device());
+
+    // Free data on device
+    d_free_3d(old_dev, data);
+    d_free_3d(new_dev, data_new);
+    d_free_3d(f_dev, data_f);
     
     return n;
 }
