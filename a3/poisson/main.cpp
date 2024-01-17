@@ -77,8 +77,8 @@ int main(int argc, char *argv[])
 
     // Here we test d_malloc_3d()
     double *data;
-    double ***old_dev = d_malloc_3d(N, N, N, &data);
-    omp_target_memcpy(data, u[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    double ***old_dev = d_malloc_3d(N2, N2, N2, &data);
+    omp_target_memcpy(data, u[0][0], N2*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     #pragma omp target
     {
         printf("Hello from device. Value of old_dev[0][0][0] is %lf \n", old_dev[0][0][0]);

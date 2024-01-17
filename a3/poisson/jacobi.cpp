@@ -173,6 +173,7 @@ int
 jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, int N, double tol){
    
     // Variables we will use
+    int N2 = N+2;
     double ***temp;
     double h = 1.0/6.0;
     double delta_sq = 4.0/((double) N*N+2*N+1);
@@ -181,7 +182,7 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
     int i,j,k = 0;
 
     // Data transfer using map clause
-    #pragma omp target enter data map(to: old[:N][:N][:N]) map(to: f[:N][:N][:N]) map(alloc: newVol[:N][:N][:N])
+    #pragma omp target enter data map(to: old[:N2][:N2][:N2]) map(to: f[:N2][:N2][:N2]) map(alloc: newVol[:N2][:N2][:N2])
 
     // Main loop of jacobi
     while(n < max_iter){
@@ -197,14 +198,10 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
             }
         }
 
-        #pragma omp target update map(from: old[:N][:N][:N]) map(from: newVol[:N][:N][:N])
-
         // Switch pointers
         temp = old;
         old = newVol;
         newVol = temp;
-
-        #pragma omp target update map(to: old[:N][:N][:N]) map(to: newVol[:N][:N][:N])
 
         // // Update convergence
         // d = norm(old, newVol, N);
@@ -215,7 +212,7 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
     }
 
     // Data transfer to host
-    #pragma omp target exit data map(from: old[:N][:N][:N]) map(release: f[:N][:N][:N]) map(release: newVol[:N][:N][:N])
+    #pragma omp target exit data map(from: old[:N2][:N2][:N2]) map(release: f[:N2][:N2][:N2]) map(release: newVol[:N2][:N2][:N2])
     
     return n;
 }
@@ -237,13 +234,13 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
     double *data;
     double *data_f;
     double *data_new;
-    double ***old_dev = d_malloc_3d(N, N, N, &data);
-    double ***f_dev = d_malloc_3d(N, N, N, &data_f);
-    double ***new_dev = d_malloc_3d(N, N, N, &data_new);
+    double ***old_dev = d_malloc_3d(N+2, N+2, N+2, &data);
+    double ***f_dev = d_malloc_3d(N+2, N+2, N+2, &data_f);
+    double ***new_dev = d_malloc_3d(N+2, N+2, N+2, &data_new);
 
     // Data transfer using memcopy
-    omp_target_memcpy(data, old[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
-    omp_target_memcpy(data_f, f[0][0], N*N*N*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    omp_target_memcpy(data, old[0][0], (N+2)*(N+2)*(N+2)*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
+    omp_target_memcpy(data_f, f[0][0], (N+2)*(N+2)*(N+2)*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
 
     // Main loop of jacobi
     while(n < max_iter){
@@ -277,7 +274,7 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
     }
 
     // Data transfer to host
-    omp_target_memcpy(old[0][0], data, N*N*N*sizeof(double), 0, 0, omp_get_initial_device(), omp_get_default_device());
+    omp_target_memcpy(old[0][0], data, (N+2)*(N+2)*(N+2)*sizeof(double), 0, 0, omp_get_initial_device(), omp_get_default_device());
     
     return n;
 }

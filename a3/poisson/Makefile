@@ -2,7 +2,6 @@ TARGET= poisson
 OBJS	= main.o \
         jacobi.o \
         init.o \
-        input.o \
         print.o \
         alloc3d.o \
 
