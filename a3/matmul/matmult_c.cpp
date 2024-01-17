@@ -1,15 +1,18 @@
 #include <stdio.h>
-#include <cblas.h>
-#define MIN(a,b) (((a)<(b))?(a):(b))
+extern "C" {
+    #include <cblas.h>
+    #define MIN(a,b) (((a)<(b))?(a):(b))
 
-void matmult_lib(int m, int n, int k, double **A, double **B, double **C) {
-    double alpha = 1.0;
-    double beta = 0.0;
-    int lda = k;
-    int ldb = n;
-    int ldc = n;
-    cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A[0], lda, B[0], ldb, beta, C[0], ldc);
-    }
+    void matmult_lib(int m, int n, int k, double **A, double **B, double **C) {
+        double alpha = 1.0;
+        double beta = 0.0;
+        int lda = k;
+        int ldb = n;
+        int ldc = n;
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, m, n, k, alpha, A[0], lda, B[0], ldb, beta, C[0], ldc);
+        }
+
+}
 
 void zeroC(int m, int n, double **C) {
     for (int i = 0; i < m; i++) {
