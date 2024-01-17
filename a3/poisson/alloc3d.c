@@ -1,4 +1,44 @@
-void init_jacobi(double ***old, double ***newVol, double ***f, int N2, double T0){
+#include <stdlib.h>
+
+double ***
+malloc_3d(int m, int n, int k)
+{
+
+    if (m <= 0 || n <= 0 || k <= 0)
+        return NULL;
+
+    double ***p = (double ***)malloc(m * sizeof(double **) +
+                                     m * n * sizeof(double *));
+    if (p == NULL)
+    {
+        return NULL;
+    }
+
+    for (int i = 0; i < m; i++)
+    {
+        p[i] = (double **)p + m + i * n;
+    }
+
+    double *a = (double *)malloc(m * n * k * sizeof(double));
+    if (a == NULL)
+    {
+        free(p);
+        return NULL;
+    }
+
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            p[i][j] = a + (i * n * k) + (j * k);
+        }
+    }
+
+    return p;
+}
+
+
+void init_jacobi(double ***old, double ***new, double ***f, int N2, double T0){
     // Set boundary conditions
     #pragma omp parallel
     {
@@ -7,7 +47,7 @@ void init_jacobi(double ***old, double ***newVol, double ***f, int N2, double T0
         for(int j = 0; j < N2; j++){
             for(int k = 0; k < N2; k++){
                 old[i][j][k] = T0;
-                newVol[i][j][k] = T0;
+                new[i][j][k] = T0;
             }
         }
     }
@@ -20,12 +60,12 @@ void init_jacobi(double ***old, double ***newVol, double ***f, int N2, double T0
             old[i][N2-1][j] = 20.0;
             old[i][j][0] = 20.0;
             old[i][j][N2-1] = 20.0;
-            newVol[0][i][j] = 20.0;
-            newVol[N2-1][i][j] = 20.0;
-            newVol[i][0][j] = 0.0;
-            newVol[i][N2-1][j] = 20.0;
-            newVol[i][j][0] = 20.0;
-            newVol[i][j][N2-1] = 20.0;
+            new[0][i][j] = 20.0;
+            new[N2-1][i][j] = 20.0;
+            new[i][0][j] = 0.0;
+            new[i][N2-1][j] = 20.0;
+            new[i][j][0] = 20.0;
+            new[i][j][N2-1] = 20.0;
         }
     }
     #pragma omp for 
@@ -84,4 +124,10 @@ void init_seidel(double ***u, double ***f, int N2, double T0){
         }
     }
     return;
+}
+
+void free_3d(double ***p)
+{
+    free(p[0][0]);
+    free(p);
 }
