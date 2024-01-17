@@ -7,14 +7,8 @@
 #include "print.h"
 #include <omp.h>
 #include <string.h>
-
-#ifdef _JACOBI
 #include "jacobi.h"
-#endif
 
-#ifdef _GAUSS_SEIDEL
-#include "gauss_seidel.h"
-#endif
 
 #define N_DEFAULT 100
 
@@ -45,7 +39,7 @@ int main(int argc, char *argv[])
     start_T = atof(argv[4]);   // start T for all inner grid points
     output_type = atoi(argv[5]); // ouput type
 
-    exp_type = atoi(argv[6]); // Experiment type
+    // exp_type = atoi(argv[6]); // Experiment type
 
     // char exp_type_str = malloc(strlen(argv[6]) + 1);
     // if(exp_type_str == NULL){
@@ -67,24 +61,19 @@ int main(int argc, char *argv[])
         perror("array u: allocation failed");
         exit(-1);
     }
+    if ((u2 = malloc_3d(N2, N2, N2)) == NULL)
+    {
+        perror("array u: allocation failed");
+        exit(-1);
+    }
     if ((f = malloc_3d(N2, N2, N2)) == NULL){
         perror("array u: allocation failed");
         exit(-1);
     }
 
     // Set boundary conditions
-    #ifdef _JACOBI
-    if ((u2 = malloc_3d(N2, N2, N2)) == NULL)
-    {
-        perror("array u: allocation failed");
-        exit(-1);
-    }
     init_jacobi(u, u2, f, N2, start_T);
-    #endif
 
-    #ifdef _GAUSS_SEIDEL
-    init_seidel(u, f, N2, start_T);
-    #endif
 
     // Call to Jacobi or Gauss-Seidel
     #ifdef _JACOBI
@@ -155,9 +144,7 @@ int main(int argc, char *argv[])
 
     // de-allocate memory
     free_3d(u);
-    #ifdef _JACOBI
     free_3d(u2);
-    #endif
     free_3d(f);
 
     return (0);
