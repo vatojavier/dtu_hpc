@@ -1,0 +1,20 @@
+#!/bin/sh
+#BSUB -J proftest
+#BSUB -q hpcintrogpu
+#BSUB -n 4
+#BSUB -R "span[hosts=1]" 
+#BSUB -gpu "num=1:mode=exclusive_process" 
+#BSUB -W 10
+#BSUB -R "rusage[mem=2048]" 
+
+export TMPDIR=$__LSF_JOB_TMPDIR__
+
+module load /appl9/nvhpc/2023_2311/modulefiles/nvhpc-nompi/23.11
+
+export MFLOPS_MAX_IT=1 
+
+ncu -o profile_$LSB_JOBID \
+ --section MemoryWorkloadAnalysis \
+ --section MemoryWorkloadAnalysis_Chart \
+ --section ComputeWorkloadAnalysis \
+./poisson 100 200 0.0005 0.0 0
