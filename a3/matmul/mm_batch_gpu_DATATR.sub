@@ -1,0 +1,48 @@
+
+#!/bin/bash
+# 02614 - High-Performance Computing, January 2024
+# Batch script to run matmult on a dedicated GPU server in the hpcintrogpu queue
+#
+# Author: Bernd Dammann <bd@cc.dtu.dk>
+#         Hans Henrik Brandenborg Sørensen <hhbs@dtu.dk>
+#
+#BSUB -J mm_batch_gpu
+#BSUB -o mm_batch_gpu_%J.out
+#BSUB -q hpcintrogpu
+#BSUB -n 32
+#BSUB -R "rusage[mem=2048]"
+#BSUB -W 15
+#BSUB -R "span[hosts=1]"
+#BSUB -gpu "num=1:mode=exclusive_process"
+
+EXECUTABLE=matmult_c.nvc++
+
+# Define the matrix sizes
+SIZES="800 1000 2000 5000"
+
+# Define the method types
+TYPES="mnk_offload mkn_offload blk_offload asy_offload"
+
+# Enable result checking
+export MATMULT_COMPARE=0
+
+# Set the environment variable for timing
+export PRINT_DATA_TRANSFER_TIME=1
+
+export MFLOPS_MAX_IT=1
+
+# Load module for shared cuda libraries
+module load /appl9/nvhpc/2023_2311/modulefiles/nvhpc-nompi/23.11
+
+# Create a directory for the results
+RESULT_DIR="matmult_results_1"
+mkdir -p $RESULT_DIR
+
+# Run experiments for each type and size
+for TYPE in $TYPES
+do
+    for S in $SIZES
+    do
+        ./$EXECUTABLE $TYPE $S $S $S >> "${RESULT_DIR}/${TYPE}_${S}_results.txt"
+    done
+done
