@@ -65,7 +65,7 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
 
     // Main loop of jacobi
     while(n < max_iter){
-        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, N, delta_sq)
+        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, N, delta_sq) collapse(2)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
@@ -118,7 +118,7 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
 
     // Main loop of jacobi
     while(n < max_iter){
-        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, delta_sq, N)
+        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, delta_sq, N) collapse(2)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
@@ -306,7 +306,7 @@ jacobi_offload_norm(double ***old, double ***newVol, double ***f, int max_iter, 
     // Main loop of jacobi
     while(d > tol && n < max_iter){
         d = 0.0;
-        #pragma omp target teams distribute parallel for shared(h, N, delta_sq) reduction(+: d)
+        #pragma omp target teams distribute parallel for shared(h, N, delta_sq) reduction(+: d) collapse(2)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
