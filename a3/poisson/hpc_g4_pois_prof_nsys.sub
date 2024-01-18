@@ -1,7 +1,7 @@
 #!/bin/sh
-#BSUB -J g4_proftest_nsys
-#BSUB -o g4_proftest_nsys_%J.out
-#BSUB -e g4_proftest_nsys_%J.err
+#BSUB -J g4_test_pois
+#BSUB -o g4_test_pois_%J.out
+#BSUB -e g4_test_pois_%J.err
 #BSUB -q hpcintrogpu
 #BSUB -n 4
 #BSUB -N
@@ -12,8 +12,8 @@
 
 # export TMPDIR=$__LSF_JOB_TMPDIR__
 
-# module load /appl9/nvhpc/2023_2311/modulefiles/nvhpc-nompi/23.11
+module load /appl9/nvhpc/2023_2311/modulefiles/nvhpc-nompi/23.11
 
 # export MFLOPS_MAX_IT=1 
 
-nsys profile ./poisson 100 200 0.0005 0.0 0
+./poisson 100 200 0.0005 0.0 0

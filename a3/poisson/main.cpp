@@ -9,6 +9,8 @@
 #include <omp.h>
 #include <string.h>
 #include "jacobi.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 
 #define N_DEFAULT 100
@@ -86,12 +88,13 @@ int main(int argc, char *argv[])
     //    printf("Also the value of old_dev[2][0][2] is %lf \n", old_dev[2][0][2]);
     //}
     
-    /*
-    printf("Now it is the host speaking. We will run the three jacobi functions. \n");    
+    // CPU OMP
     time_start = omp_get_wtime();
     used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
     time_end = omp_get_wtime();
     printf("%d %lf CPU \n", N, time_end - time_start);
+    printf("Sanity check: %lf \n", u[50][50][50]);
+
 
     // GPU MAP
     init_jacobi(u, u2, f, N2, start_T);
@@ -99,12 +102,10 @@ int main(int argc, char *argv[])
     used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
     time_end = omp_get_wtime();
     printf("%d %lf GPUMAP \n", N, time_end - time_start);
-    //printf("Sanity check: %lf \n", u[50][50][50]);
+    printf("Sanity check: %lf \n", u[50][50][50]);
 
     // GPU MEMCPY
     init_jacobi(u, u2, f, N2, start_T);
-
-    */
     time_start = omp_get_wtime();
     used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
     time_end = omp_get_wtime();
@@ -112,16 +113,28 @@ int main(int argc, char *argv[])
     printf("Sanity check: %lf \n", u[50][50][50]);
 
     // Exercise 8
-    /*
-    
     init_jacobi(u, u2, f, N2, start_T);
     time_start = omp_get_wtime();
     used_iter = jacobi_offload_norm(u, u2, f, iter_max, N, tolerance);
     time_end = omp_get_wtime();
-    printf("%d %lf GPUCPY \n", N, time_end - time_start);
+    printf("%d %lf GPUNRM\n", N, time_end - time_start);
     printf("Sanity check: %lf \n", u[50][50][50]);
 
-    */
+    printf("Device count: %d \n", omp_get_num_devices());
+    omp_set_default_device(0);
+    printf("Hello from device %d \n", omp_get_default_device());
+    omp_set_default_device(1);
+    printf("Hello from device %d \n", omp_get_default_device());
+    omp_set_default_device(0);
+    
+    // Exercise 7
+    init_jacobi(u, u2, f, N2, start_T);
+    time_start = omp_get_wtime();
+    used_iter = jacobi_offload_multi(u, u2, f, iter_max, N, tolerance);
+    time_end = omp_get_wtime();
+    printf("%d %lf GPUMUL \n", N, time_end - time_start);
+    printf("Sanity check: %lf \n", u[50][50][50]);
+    
 
     // dump  results if wanted
     switch (output_type)

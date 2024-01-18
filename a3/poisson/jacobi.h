@@ -12,6 +12,7 @@
 int jacobi_improved(double ***, double ***, double ***, int, int, double);
 int jacobi_offload_map(double ***, double ***, double ***, int, int, double);
 int jacobi_offload_memcopy(double ***, double ***, double ***, int, int, double);
+int jacobi_offload_multi(double ***, double ***, double ***, int, int, double);
 int jacobi_offload_norm(double ***, double ***, double ***, int, int, double);
 
 #endif
