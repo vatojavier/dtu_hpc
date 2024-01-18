@@ -171,7 +171,7 @@ extern "C" {
         data_in_time = end_time - start_time;
 
         // Parallel loop for each slab
-        #pragma omp parallel for// reduction(+:computation_time)
+        #pragma omp parallel for reduction(+:computation_time)
         for (int s = 0; s < SLAPS; ++s) {
             int length = m / SLAPS;
             int start = s * length;

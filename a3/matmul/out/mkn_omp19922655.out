@@ -1,0 +1,87 @@
+   23437.500 403548.756 # matmult_mkn_omp
+   93750.000 258840.818 # matmult_mkn_omp
+  375000.000  95746.211 # matmult_mkn_omp
+ 1500000.000 113636.974 # matmult_mkn_omp
+ 3375000.000 122689.352 # matmult_mkn_omp
+ 6000000.000 117037.295 # matmult_mkn_omp
+ 9375000.000 117324.525 # matmult_mkn_omp
+21093750.000 118374.451 # matmult_mkn_omp
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 19922655: <mkn_omp> in cluster <dcc> Done
+
+Job <mkn_omp> was submitted from host <n-62-11-47> by user <s194235> in cluster <dcc> at Thu Jan 18 16:19:02 2024
+Job was executed on host(s) <32*n-62-12-89>, in queue <hpcintrogpu>, as user <s194235> in cluster <dcc> at Thu Jan 18 16:20:21 2024
+</zhome/04/5/147207> was used as the home directory.
+</zhome/04/5/147207/HPC/dtu_hpc/a3/matmul> was used as the working directory.
+Started at Thu Jan 18 16:20:21 2024
+Terminated at Thu Jan 18 16:32:40 2024
+Results reported at Thu Jan 18 16:32:40 2024
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+# 02614 - High-Performance Computing, January 2024
+# 
+# batch script to run matmult on a dedicated GPU server in the hpcintrogpu
+# queue
+#
+# Author: Bernd Dammann <bd@cc.dtu.dk>
+#         Hans Henrik Brandenborg Sørensen <hhbs@dtu.dk>
+#
+#BSUB -J mkn_omp
+#BSUB -o out/mkn_omp%J.out
+#BSUB -q hpcintrogpu
+#BSUB -n 32
+#BSUB -R "rusage[mem=2048]"
+#BSUB -W 15
+#BSUB -R "span[hosts=1]"
+#BSUB -gpu "num=1:mode=exclusive_process"
+
+# define the driver name to use
+# valid values: matmult_c.nvc++, matmult_f.nvc++
+#
+EXECUTABLE=matmult_c.nvc++
+
+# define the mkn values in the MKN variable
+#
+SIZES="1000 2000 4000 8000 12000 16000 20000 30000"
+
+# define the method type in TYPE
+#
+TYPE="mkn_omp"
+
+# enable(1)/disable(0) result checking
+export MATMULT_COMPARE=0
+
+# load module for shared cuda libraries
+module load /appl9/nvhpc/2023_2311/modulefiles/nvhpc-nompi/23.11
+
+# start the collect command with the above settings
+for S in $SIZES
+do
+    OMP_NUM_THREADS=32 ./$EXECUTABLE $TYPE $S $S $S
+done
+
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   22752.00 sec.
+    Max Memory :                                 193 MB
+    Average Memory :                             150.50 MB
+    Total Requested Memory :                     65536.00 MB
+    Delta Memory :                               65343.00 MB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                40
+    Run time :                                   740 sec.
+    Turnaround time :                            818 sec.
+
+The output (if any) is above this job summary.
+
