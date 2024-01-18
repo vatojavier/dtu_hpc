@@ -154,30 +154,36 @@ extern "C" {
         zeroC(m, n, C);
 
         #define SLAPS 4
+        #define BLK 4  // Block size for computation
 
         if (m % SLAPS != 0) {
             printf("ERROR; will not give correct results, m must be divisible by SLAPS, but was m=%d, SLAPS=%d\n", m, SLAPS);
             return;
         }
 
-        double start_time, end_time, total_data_transfer_time = 0.0;
+        double start_time, end_time, data_in_time, computation_time = 0.0, data_out_time, total_data_transfer_time = 0.0;
+        
+        // Data transfer into the device
         start_time = omp_get_wtime();
-
         #pragma omp target enter data map(to: A[0:m][0:k], B[0:k][0:n], C[0:m][0:n])
         end_time = omp_get_wtime();
-        total_data_transfer_time += (end_time - start_time);
+        data_in_time = end_time - start_time;
 
-        #pragma omp parallel for
+        // Parallel loop for each slab
+        #pragma omp parallel for// reduction(+:computation_time)
         for (int s = 0; s < SLAPS; ++s) {
             int length = m / SLAPS;
             int start = s * length;
 
+            // Asynchronous data transfer for slab
             start_time = omp_get_wtime();
-            // #pragma target data update device(A[start:length][0:k]) depend(out: A) nowait
-            
+            #pragma omp target data //update //to(A[start:length][0:k]) nowait
             end_time = omp_get_wtime();
             total_data_transfer_time += (end_time - start_time);
 
+
+            // Computation for slab
+            double slab_computation_start = omp_get_wtime();
             #pragma omp target teams distribute parallel for map(to: A[start:length][0:k]) num_teams(length) thread_limit(16) collapse(2)
             for (int i = 0; i < start+length; i += BLK) { 
                 for (int j = 0; j < n; ++j) { 
@@ -208,21 +214,30 @@ extern "C" {
                     }
                 }
             } 
+            double slab_computation_end = omp_get_wtime();
+            computation_time += (slab_computation_end - slab_computation_start);
+
+            // Asynchronous data transfer out for slab
             #pragma omp target update from(C[start:length][:n]) nowait
         }
-        // is taskwait this necessary
-        // #pragma omp taskwait 
+        // Synchronization
+        #pragma omp taskwait
+
+        // Data transfer out of the device
         start_time = omp_get_wtime();
         #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
-        
         end_time = omp_get_wtime();
-        total_data_transfer_time += (end_time - start_time);
-        // Output or use the total_data_transfer_time for analysis
-        // Check if the environment variable is set
+        data_out_time = end_time - start_time;
+
+        // Output timing information
+        total_data_transfer_time += data_in_time + data_out_time;
         char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
         if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
-            printf("Data Transfer Time: %f seconds\n", total_data_transfer_time);
-    }
+            printf("Data Transfer In Time: %f seconds\n", data_in_time);
+            printf("Computation Time: %f seconds\n", computation_time);
+            printf("Data Transfer Out Time: %f seconds\n", data_out_time);
+            printf("Total Data Transfer Time (including async): %f seconds\n", total_data_transfer_time);
+        }
     }
 
     void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) {
