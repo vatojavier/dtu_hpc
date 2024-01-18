@@ -153,7 +153,7 @@ extern "C" {
     void matmult_asy_offload(int m, int n, int k, double **A, double **B, double **C) {
         zeroC(m, n, C);
 
-        #define SLAPS 4
+        #define SLAPS 8
         #define BLK 4  // Block size for computation
 
         if (m % SLAPS != 0) {
@@ -184,7 +184,7 @@ extern "C" {
 
             // Computation for slab
             double slab_computation_start = omp_get_wtime();
-            #pragma omp target teams distribute parallel for map(to: A[start:length][0:k]) num_teams(length) thread_limit(16) collapse(2)
+            #pragma omp target teams distribute parallel for map(to: A[start:length][0:k], C[start:length][0:n]) num_teams(length) thread_limit(16) collapse(2) nowait
             for (int i = 0; i < start+length; i += BLK) { 
                 for (int j = 0; j < n; ++j) { 
                     if (i + BLK - 1 < m) { 
