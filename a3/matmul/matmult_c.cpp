@@ -153,8 +153,7 @@ extern "C" {
     void matmult_asy_offload(int m, int n, int k, double **A, double **B, double **C) {
         zeroC(m, n, C);
 
-        #define SLAPS 8
-        #define BLK 4  // Block size for computation
+        #define SLAPS 4
 
         if (m % SLAPS != 0) {
             printf("ERROR; will not give correct results, m must be divisible by SLAPS, but was m=%d, SLAPS=%d\n", m, SLAPS);
@@ -165,7 +164,9 @@ extern "C" {
         
         // Data transfer into the device
         start_time = omp_get_wtime();
-        #pragma omp target enter data map(to: A[0:m][0:k], B[0:k][0:n], C[0:m][0:n])
+
+        #pragma omp target enter data map(alloc: A[0:m][0:k], C[0:m][0:n])
+        #pragma omp target enter data map(to: B[0:k][0:n])
         end_time = omp_get_wtime();
         data_in_time = end_time - start_time;
 
@@ -175,17 +176,11 @@ extern "C" {
             int length = m / SLAPS;
             int start = s * length;
 
-            // Asynchronous data transfer for slab
-            start_time = omp_get_wtime();
-            #pragma omp target data //update //to(A[start:length][0:k]) nowait
-            end_time = omp_get_wtime();
-            total_data_transfer_time += (end_time - start_time);
+            #pragma omp target update to(A[start:length][0:k], C[start:length][0:n]) nowait
 
-
-            // Computation for slab
-            double slab_computation_start = omp_get_wtime();
-            #pragma omp target teams distribute parallel for map(to: A[start:length][0:k], C[start:length][0:n]) num_teams(length) thread_limit(16) collapse(2) nowait
-            for (int i = 0; i < start+length; i += BLK) { 
+            #pragma omp target teams distribute parallel for \
+            num_teams(length) thread_limit(16) collapse(2) nowait
+            for (int i = start; i < start+length; i += BLK) { 
                 for (int j = 0; j < n; ++j) { 
                     if (i + BLK - 1 < m) { 
                         double sum[BLK] = {0}; 
@@ -202,28 +197,19 @@ extern "C" {
                         
                     } else { 
                         // Do the remainder part here 
-                        double sum[BLK] = {0}; 
-                        for (int l = 0; l < k; l++) { 
-                            for (int ii = i; ii < m; ii++) { 
-                                sum[ii-i] += A[ii][l] * B[l][j]; 
+                        for (int ii = 0; ii < (m-i); ii++) { 
+                            double sum = 0.0; 
+                            for (int l = 0; l < k; l++) {
+                                sum += A[i+ii][l] * B[l][j]; 
                             }
-                        }
-                        for (int ii = i; ii < m; ii++) { 
-                            C[ii][j] += sum[ii-i]; 
+                            C[i+ii][j] = sum; 
                         }
                     }
                 }
             } 
-            double slab_computation_end = omp_get_wtime();
-            computation_time += (slab_computation_end - slab_computation_start);
-
-            // Asynchronous data transfer out for slab
-            #pragma omp target update from(C[start:length][:n]) nowait
+            // #pragma omp target update from(C[start:length][0:n]) nowait
         }
-        // Synchronization
-        #pragma omp taskwait
-
-        // Data transfer out of the device
+        // #pragma omp taskwait
         start_time = omp_get_wtime();
         #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
         end_time = omp_get_wtime();
