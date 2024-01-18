@@ -160,15 +160,18 @@ extern "C" {
             return;
         }
 
-        double start_time, end_time, total_data_transfer_time = 0.0;
+        double start_time, end_time, data_in_time, computation_time = 0.0, data_out_time, total_data_transfer_time = 0.0;
+        
+        // Data transfer into the device
         start_time = omp_get_wtime();
 
         #pragma omp target enter data map(alloc: A[0:m][0:k], C[0:m][0:n])
         #pragma omp target enter data map(to: B[0:k][0:n])
         end_time = omp_get_wtime();
-        total_data_transfer_time += (end_time - start_time);
+        data_in_time = end_time - start_time;
 
-        #pragma omp parallel for
+        // Parallel loop for each slab
+        #pragma omp parallel for// reduction(+:computation_time)
         for (int s = 0; s < SLAPS; ++s) {
             int length = m / SLAPS;
             int start = s * length;
@@ -209,15 +212,18 @@ extern "C" {
         // #pragma omp taskwait
         start_time = omp_get_wtime();
         #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
-        
         end_time = omp_get_wtime();
-        total_data_transfer_time += (end_time - start_time);
-        // Output or use the total_data_transfer_time for analysis
-        // Check if the environment variable is set
+        data_out_time = end_time - start_time;
+
+        // Output timing information
+        total_data_transfer_time += data_in_time + data_out_time;
         char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
         if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
-            printf("Data Transfer Time: %f seconds\n", total_data_transfer_time);
-    }
+            printf("Data Transfer In Time: %f seconds\n", data_in_time);
+            printf("Computation Time: %f seconds\n", computation_time);
+            printf("Data Transfer Out Time: %f seconds\n", data_out_time);
+            printf("Total Data Transfer Time (including async): %f seconds\n", total_data_transfer_time);
+        }
     }
 
     void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) {

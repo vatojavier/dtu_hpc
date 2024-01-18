@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <omp.h>
 
 double ***
@@ -50,6 +51,7 @@ double ***d_malloc_3d(int m, int n, int k, double **data){
         return NULL;
     }
 
+    // printf("testtest 0 \n");
     // Set the outer array of pointers
     #pragma omp target is_device_ptr(p)
     {
@@ -57,14 +59,14 @@ double ***d_malloc_3d(int m, int n, int k, double **data){
         p[i] = (double **)p + m + i * n;
     }
     } // End target
-
+    // printf("testtest 1 \n");
     // Allocate data vector
     double *a = (double *) omp_target_alloc(m*n*k*sizeof(double), omp_get_default_device());
     if(a == NULL){
         omp_target_free(p, omp_get_default_device());
         return NULL;
     }
-
+    // printf("testtest 2 \n");
     // Set the inner array of pointers to match data vector
     #pragma omp target is_device_ptr(p, a)
     {
@@ -74,7 +76,7 @@ double ***d_malloc_3d(int m, int n, int k, double **data){
         }
     }
     } // End target
-
+    // printf("testtest 3 \n");
     *data = a;
     return p;
 }
