@@ -41,8 +41,7 @@ int main(int argc, char *argv[])
     tolerance = atof(argv[3]); // tolerance
     start_T = atof(argv[4]);   // start T for all inner grid points
     output_type = atoi(argv[5]); // ouput type
-
-    // exp_type = atoi(argv[6]); // Experiment type
+    exp_type = atoi(argv[6]); // Experiment type
 
     // char exp_type_str = malloc(strlen(argv[6]) + 1);
     // if(exp_type_str == NULL){
@@ -77,64 +76,44 @@ int main(int argc, char *argv[])
     // Set boundary conditions
     init_jacobi(u, u2, f, N2, start_T);
 
-    // Here we test d_malloc_3d()
 
-    //double *data;
-    //double ***old_dev = d_malloc_3d(N2, N2, N2, &data);
-    //omp_target_memcpy(data, u[0][0], N2*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
-    //#pragma omp target
-    //{
-    //    printf("Hello from device. Value of old_dev[0][0][0] is %lf \n", old_dev[0][0][0]);
-    //    printf("Also the value of old_dev[2][0][2] is %lf \n", old_dev[2][0][2]);
-    //}
-    
-    // CPU OMP
-    time_start = omp_get_wtime();
-    used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
-    time_end = omp_get_wtime();
-    printf("%d %lf CPU \n", N, time_end - time_start);
-    printf("Sanity check: %lf \n", u[50][50][50]);
+    // Run a method
+    switch (exp_type)
+    {
+    case 1:
+        time_start = omp_get_wtime();
+        used_iter = jacobi_improved(u, u2, f, iter_max, N, tolerance);
+        time_end = omp_get_wtime();
+        printf("%d %d %lf CPU \n", N, iter_max , time_end - time_start);
+        break;
+    case 2:
+        time_start = omp_get_wtime();
+        used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
+        time_end = omp_get_wtime();
+        printf("%d %d %lf GPUMAP \n", N, iter_max, time_end - time_start);
+        break;
+    case 3:
+        time_start = omp_get_wtime();
+        used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
+        time_end = omp_get_wtime();
+        printf("%d %d %lf GPUMEM \n", N, iter_max, time_end - time_start);
+        break;
+    case 4:
+        time_start = omp_get_wtime();
+        used_iter = jacobi_offload_multi(u, u2, f, iter_max, N, tolerance);
+        time_end = omp_get_wtime();
+        printf("%d %d %lf GPUMUL \n", N, iter_max, time_end - time_start);
+        break;
+    case 5:
+        time_start = omp_get_wtime();
+        used_iter = jacobi_offload_norm(u, u2, f, iter_max, N, tolerance);
+        time_end = omp_get_wtime();
+        printf("%d %d %lf GPUMNRM \n", N, iter_max, time_end - time_start);
+        break;
+    default:
+        break;
+    }
 
-
-    // GPU MAP
-    init_jacobi(u, u2, f, N2, start_T);
-    time_start = omp_get_wtime();
-    used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
-    time_end = omp_get_wtime();
-    printf("%d %lf GPUMAP \n", N, time_end - time_start);
-    printf("Sanity check: %lf \n", u[50][50][50]);
-
-    // GPU MEMCPY
-    init_jacobi(u, u2, f, N2, start_T);
-    time_start = omp_get_wtime();
-    used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
-    time_end = omp_get_wtime();
-    printf("%d %lf GPUCPY \n", N, time_end - time_start);
-    printf("Sanity check: %lf \n", u[50][50][50]);
-
-    // Exercise 8
-    init_jacobi(u, u2, f, N2, start_T);
-    time_start = omp_get_wtime();
-    used_iter = jacobi_offload_norm(u, u2, f, iter_max, N, tolerance);
-    time_end = omp_get_wtime();
-    printf("%d %lf GPUNRM\n", N, time_end - time_start);
-    printf("Sanity check: %lf \n", u[50][50][50]);
-
-    printf("Device count: %d \n", omp_get_num_devices());
-    omp_set_default_device(0);
-    printf("Hello from device %d \n", omp_get_default_device());
-    omp_set_default_device(1);
-    printf("Hello from device %d \n", omp_get_default_device());
-    omp_set_default_device(0);
-    
-    // Exercise 7
-    init_jacobi(u, u2, f, N2, start_T);
-    time_start = omp_get_wtime();
-    used_iter = jacobi_offload_multi(u, u2, f, iter_max, N, tolerance);
-    time_end = omp_get_wtime();
-    printf("%d %lf GPUMUL \n", N, time_end - time_start);
-    printf("Sanity check: %lf \n", u[50][50][50]);
-    
 
     // dump  results if wanted
     switch (output_type)
