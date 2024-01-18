@@ -26,6 +26,7 @@ extern "C" {
 
     // I give up on this version I can only find examples online where they have double * pointers 
     // see ex https://github.com/colleeneb/openmp_offload_and_blas/blob/master/cublas/c/dgemm_cublas.c
+    // 2
     void matmult_lib_offload2(int m, int n, int k, double **A, double **B, double **C){
         cublasHandle_t handle; 
         cublasCreate(&handle);
