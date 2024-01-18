@@ -29,7 +29,7 @@ extern "C" {
     // I give up on this version I can only find examples online where they have double * pointers 
     // see ex https://github.com/colleeneb/openmp_offload_and_blas/blob/master/cublas/c/dgemm_cublas.c
     // 2
-    void matmult_lib_offload(int m, int n, int k, double *A, double *B, double *C) {
+    void matmult_lib_offload2(int m, int n, int k, double *A, double *B, double *C) {
         cublasHandle_t handle;
         cublasCreate(&handle);
 
@@ -52,10 +52,10 @@ extern "C" {
         cublasDestroy(handle);
 
         // Transfer results back to the host
-        #pragma omp target exit data map(from: C[0:m*n])
+        #pragma omp target exit data map(from: C[0:m*n]) map(release: A[0:m*k], B[0:k*n])
     }
 
-    void matmult_lib_offload2(int m, int n, int k, double **A, double **B, double **C) {
+    void matmult_lib_offload(int m, int n, int k, double **A, double **B, double **C) {
         cublasHandle_t handle;
         cublasCreate(&handle);
 
@@ -153,7 +153,7 @@ extern "C" {
     void matmult_asy_offload(int m, int n, int k, double **A, double **B, double **C) {
         zeroC(m, n, C);
 
-        #define SLAPS 2
+        #define SLAPS 4
 
         if (m % SLAPS != 0) {
             printf("ERROR; will not give correct results, m must be divisible by SLAPS, but was m=%d, SLAPS=%d\n", m, SLAPS);
@@ -173,13 +173,13 @@ extern "C" {
             int start = s * length;
 
             start_time = omp_get_wtime();
-            #pragma target data update device(A[start:length][0:k]) depend(out: A) nowait
+            // #pragma target data update device(A[start:length][0:k]) depend(out: A) nowait
             
             end_time = omp_get_wtime();
             total_data_transfer_time += (end_time - start_time);
 
-            #pragma omp target teams distribute parallel for map(to: A[start:length][0:k]) num_teams(m) thread_limit(16) depend(in: A) depend(out: C) collapse(2)
-            for (int i = 0; i < m; i += BLK) { 
+            #pragma omp target teams distribute parallel for map(to: A[start:length][0:k]) num_teams(length) thread_limit(16) collapse(2)
+            for (int i = 0; i < start+length; i += BLK) { 
                 for (int j = 0; j < n; ++j) { 
                     if (i + BLK - 1 < m) { 
                         double sum[BLK] = {0}; 
@@ -208,12 +208,12 @@ extern "C" {
                     }
                 }
             } 
-            #pragma omp target update from(C[start:length][:n]) depend(in:C) nowait
+            #pragma omp target update from(C[start:length][:n]) nowait
         }
         // is taskwait this necessary
-        #pragma omp taskwait 
+        // #pragma omp taskwait 
         start_time = omp_get_wtime();
-        #pragma omp target exit data map(from: C[0:m][0:n]) map(delete: A[0:m][0:k], B[0:k][0:n])
+        #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
         
         end_time = omp_get_wtime();
         total_data_transfer_time += (end_time - start_time);
