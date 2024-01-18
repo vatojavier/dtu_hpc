@@ -204,7 +204,7 @@ extern "C" {
 
     void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) {
         zeroC(m, n, C);
-        #pragma omp parallel shared(A, B, C) num_threads(24)
+        #pragma omp parallel shared(A, B, C)
         {
         #pragma omp for 
         for (int i = 0; i < m; i++) {
