@@ -121,6 +121,7 @@ extern "C" {
                     }
                     for (int ii = i; ii < m; ii++) { 
                         C[ii][j] += sum[ii-i]; 
+                    }
             }
         }
     }
@@ -129,7 +130,11 @@ extern "C" {
     end_time = omp_get_wtime();
     data_transfer_time = end_time - start_time;
 
-    printf("Data Transfer Time in matmult_blk_offload: %f seconds\n", data_transfer_time);
+    // Check if the environment variable is set
+    char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
+    if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
+        printf("Data Transfer Time: %f seconds\n", data_transfer_time);
+    }
     }
 
     void matmult_asy_offload(int m, int n, int k, double **A, double **B, double **C) {
@@ -196,10 +201,15 @@ extern "C" {
         #pragma omp taskwait 
         start_time = omp_get_wtime();
         #pragma omp target exit data map(from: C[0:m][0:n]) map(delete: A[0:m][0:k], B[0:k][0:n])
+        
         end_time = omp_get_wtime();
         total_data_transfer_time += (end_time - start_time);
         // Output or use the total_data_transfer_time for analysis
-        printf("Total Data Transfer Time: %f seconds\n", total_data_transfer_time);
+        // Check if the environment variable is set
+        char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
+        if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
+            printf("Data Transfer Time: %f seconds\n", total_data_transfer_time);
+    }
     }
 
     void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) {
@@ -238,7 +248,11 @@ extern "C" {
     end_time = omp_get_wtime();
     data_transfer_time = end_time - start_time;
 
-    printf("Data Transfer Time in matmult_mkn_offload: %f seconds\n", data_transfer_time);
+    // Check if the environment variable is set
+    char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
+    if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
+        printf("Data Transfer Time: %f seconds\n", data_transfer_time);
+    }
     }
 
     void matmult_mnk(int m, int n, int k, double **A, double **B, double **C) {
@@ -275,7 +289,11 @@ extern "C" {
     end_time = omp_get_wtime();
     data_transfer_time = end_time - start_time;
 
-    printf("Data Transfer Time in matmult_mnk_offload: %f seconds\n", data_transfer_time);
+    // Check if the environment variable is set
+    char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
+    if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
+        printf("Data Transfer Time: %f seconds\n", data_transfer_time);
+    }
     }
 
        
