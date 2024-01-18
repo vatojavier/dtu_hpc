@@ -65,14 +65,12 @@ extern "C" {
 
         double alpha = 1.0;
         double beta = 0.0;
-        int lda = k;
-        int ldb = n;
-        int ldc = n;
 
         // why does it also work if we have the transposed leading dimensions?
-        // int lda = m;
-        // int ldb = k;
-        // int ldc = m;
+        // cublas is fortran-order
+        int lda = m;
+        int ldb = k;
+        int ldc = m;
 
         int cublas_error = cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha, d_A, lda, d_B, ldb, &beta, d_C, ldc);
         if (cublas_error != CUBLAS_STATUS_SUCCESS) {
@@ -129,7 +127,7 @@ extern "C" {
     void matmult_asy_offload(int m, int n, int k, double **A, double **B, double **C) {
         zeroC(m, n, C);
 
-        #define SLAPS 4
+        #define SLAPS 2
 
         if (m % SLAPS != 0) {
             printf("ERROR; will not give correct results, m must be divisible by SLAPS, but was m=%d, SLAPS=%d\n", m, SLAPS);
@@ -145,7 +143,7 @@ extern "C" {
 
             #pragma target data update device(A[start:length][0:k]) depend(out: A) nowait
 
-            #pragma omp target teams distribute parallel for map(to: A[start:length][0:k]) num_teams(length) thread_limit(16) depend(in: A) depend(out: C) collapse(2)
+            #pragma omp target teams distribute parallel for map(to: A[start:length][0:k]) num_teams(m) thread_limit(16) depend(in: A) depend(out: C) collapse(2)
             for (int i = 0; i < m; i += BLK) { 
                 for (int j = 0; j < n; ++j) { 
                     if (i + BLK - 1 < m) { 
