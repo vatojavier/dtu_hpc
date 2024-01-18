@@ -1,7 +1,9 @@
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
 #include <omp.h>
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h> // For strcmp
 
 extern "C" {
     #include <cblas.h>
@@ -91,29 +93,33 @@ extern "C" {
     void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
     #define BLK 4
     zeroC(m, n, C);
-    double start_time, end_time, data_transfer_time;
+    double start_time, end_time, data_in_time, computation_time, data_out_time;
 
+    // Data transfer into the device
     start_time = omp_get_wtime();
     #pragma omp target enter data map(to: A[0:m][0:k], B[0:k][0:n]) map(to: C[0:m][0:n])
+    end_time = omp_get_wtime();
+    data_in_time = end_time - start_time;
 
+    // Computation
+    start_time = omp_get_wtime();
     #pragma omp target teams loop num_teams(m) thread_limit(16) \
     map(tofrom: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n]) collapse(2)
     for (int i = 0; i < m; i += BLK) { 
-        for (int j = 0; j < n; ++j) {
-            if (i + BLK - 1 < m) {
+        for (int j = 0; j < n; ++j) { 
+            if (i + BLK - 1 < m) { 
                 double sum[BLK] = {0}; 
                 for (int l = 0; l < k; l++) { 
                     for (int ii = 0; ii < BLK; ii++) { 
                         sum[ii] += A[i + ii][l] * B[l][j]; 
                     } 
                 }
-
                 for (int ii = 0; ii < BLK; ii++) { 
                     C[i + ii][j] = sum[ii]; 
                 }
-            } else {
-                // Remainder part
-                double sum[BLK] = {0}; 
+            } else { 
+                // Do the remainder part here 
+                    double sum[BLK] = {0}; 
                     for (int l = 0; l < k; l++) { 
                         for (int ii = i; ii < m; ii++) { 
                             sum[ii-i] += A[ii][l] * B[l][j]; 
@@ -125,15 +131,22 @@ extern "C" {
             }
         }
     }
-
-    #pragma omp target exit data map(from: C[0:m][0:n])
     end_time = omp_get_wtime();
-    data_transfer_time = end_time - start_time;
+    computation_time = end_time - start_time;
 
-    // Check if the environment variable is set
+    // Data transfer out of the device
+    start_time = omp_get_wtime();
+    #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
+    end_time = omp_get_wtime();
+    data_out_time = end_time - start_time;
+
+    // Output timing information
+    // char expected with the introduction of different time measurements
     char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
     if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
-        printf("Data Transfer Time: %f seconds\n", data_transfer_time);
+        printf("Data Transfer In Time: %f seconds\n", data_in_time);
+        printf("Computation Time: %f seconds\n", computation_time);
+        printf("Data Transfer Out Time: %f seconds\n", data_out_time);
     }
     }
 
@@ -230,11 +243,16 @@ extern "C" {
 
     void matmult_mkn_offload(int m, int n, int k, double **A, double **B, double **C) {
     zeroC(m, n, C);
-    double start_time, end_time, data_transfer_time;
+    double start_time, end_time, data_in_time, computation_time, data_out_time;
 
+    // Data transfer to the GPU
     start_time = omp_get_wtime();
     #pragma omp target enter data map(to: A[0:m][0:k], B[0:k][0:n]) map(to: C[0:m][0:n])
+    end_time = omp_get_wtime();
+    data_in_time = end_time - start_time;
 
+    // Computation
+    start_time = omp_get_wtime();
     #pragma omp target teams distribute parallel for map(to: A[0:m][0:k], B[0:k][0:n]) map(tofrom: C[0:m][0:n]) num_teams(m) thread_limit(16)
     for (int i = 0; i < m; i++) {
         for (int l = 0; l < k; l++) {
@@ -243,15 +261,21 @@ extern "C" {
             }
         }
     }
-
-    #pragma omp target exit data map(from: C[0:m][0:n])
     end_time = omp_get_wtime();
-    data_transfer_time = end_time - start_time;
+    computation_time = end_time - start_time;
+
+    // Data transfer from the GPU
+    start_time = omp_get_wtime();
+    #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
+    end_time = omp_get_wtime();
+    data_out_time = end_time - start_time;
 
     // Check if the environment variable is set
     char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
     if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
-        printf("Data Transfer Time: %f seconds\n", data_transfer_time);
+        printf("Data Transfer In Time: %f seconds\n", data_in_time);
+        printf("Computation Time: %f seconds\n", computation_time);
+        printf("Data Transfer Out Time: %f seconds\n", data_out_time);
     }
     }
 
@@ -268,11 +292,16 @@ extern "C" {
 
     void matmult_mnk_offload(int m, int n, int k, double **A, double **B, double **C) {
     zeroC(m, n, C);
-    double start_time, end_time, data_transfer_time;
+    double start_time, end_time, data_in_time, computation_time, data_out_time;
 
+    // Data transfer to the GPU
     start_time = omp_get_wtime();
     #pragma omp target enter data map(to: A[0:m][0:k], B[0:k][0:n]) map(to: C[0:m][0:n])
+    end_time = omp_get_wtime();
+    data_in_time = end_time - start_time;
 
+    // Computation
+    start_time = omp_get_wtime();
     #pragma omp target teams distribute parallel for map(to: A[0:m][0:k], B[0:k][0:n]) map(tofrom: C[0:m][0:n]) \
     num_teams(m) thread_limit(16)
     for (int i = 0; i < m; i++) {
@@ -284,17 +313,23 @@ extern "C" {
             C[i][j] = sum;
         }
     }
-
-    #pragma omp target exit data map(from: C[0:m][0:n])
     end_time = omp_get_wtime();
-    data_transfer_time = end_time - start_time;
+    computation_time = end_time - start_time;
+
+    // Data transfer from the GPU
+    start_time = omp_get_wtime();
+    #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
+    end_time = omp_get_wtime();
+    data_out_time = end_time - start_time;
 
     // Check if the environment variable is set
     char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
     if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
-        printf("Data Transfer Time: %f seconds\n", data_transfer_time);
+        printf("Data Transfer In Time: %f seconds\n", data_in_time);
+        printf("Computation Time: %f seconds\n", computation_time);
+        printf("Data Transfer Out Time: %f seconds\n", data_out_time);
     }
-    }
+}
 
        
 } // end of extern "C"
