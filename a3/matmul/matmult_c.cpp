@@ -50,7 +50,7 @@ extern "C" {
         cublasDestroy(handle);
 
         // Transfer results back to the host
-        #pragma omp target exit data map(from: C[0:m*n])
+        #pragma omp target exit data map(from: C[0:m*n]) map(release: A[0:m*k], B[0:k*n])
     }
 
     void matmult_lib_offload(int m, int n, int k, double **A, double **B, double **C) {
@@ -126,11 +126,11 @@ extern "C" {
         }
     }
 
-    #pragma omp target exit data map(from: C[0:m][0:n])
+    #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
     end_time = omp_get_wtime();
     data_transfer_time = end_time - start_time;
 
-    // Check if the environment variable is set
+    Check if the environment variable is set
     char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
     if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
         printf("Data Transfer Time: %f seconds\n", data_transfer_time);
@@ -244,7 +244,7 @@ extern "C" {
         }
     }
 
-    #pragma omp target exit data map(from: C[0:m][0:n])
+    #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
     end_time = omp_get_wtime();
     data_transfer_time = end_time - start_time;
 
@@ -285,7 +285,7 @@ extern "C" {
         }
     }
 
-    #pragma omp target exit data map(from: C[0:m][0:n])
+    #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
     end_time = omp_get_wtime();
     data_transfer_time = end_time - start_time;
 
