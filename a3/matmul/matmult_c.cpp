@@ -130,7 +130,7 @@ extern "C" {
     end_time = omp_get_wtime();
     data_transfer_time = end_time - start_time;
 
-    Check if the environment variable is set
+    // Check if the environment variable is set
     char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
     if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
         printf("Data Transfer Time: %f seconds\n", data_transfer_time);
