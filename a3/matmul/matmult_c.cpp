@@ -113,7 +113,14 @@ extern "C" {
                 }
             } else {
                 // Remainder part
-                // ...
+                double sum[BLK] = {0}; 
+                    for (int l = 0; l < k; l++) { 
+                        for (int ii = i; ii < m; ii++) { 
+                            sum[ii-i] += A[ii][l] * B[l][j]; 
+                        }
+                    }
+                    for (int ii = i; ii < m; ii++) { 
+                        C[ii][j] += sum[ii-i]; 
             }
         }
     }
