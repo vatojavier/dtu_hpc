@@ -1,6 +1,7 @@
 /* jacobi.c - Poisson problem in 3d
  * 
  */
+
 #include <math.h>
 #include "alloc3d.h"
 #include <omp.h>
@@ -8,166 +9,41 @@
 #include <cuda_runtime.h>
 #include <stdio.h>
 
-
-// // Frobenius norm
-// double norm(double ***old, double ***newVol, int N){
-// double res = 0.0;
-// int i,j,k = 0;
-// #pragma omp parallel shared(old, newVol, N) private(i, j, k) reduction(+:res)
-// {
-// #pragma omp for
-// for(int i = 1; i < N+1; i++){
-//     for(int j = 1; j < N+1; j++){
-//         for(int k = 1; k < N+1; k++){
-//             res += (old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
-//         }
-//     }
-// }
-// } // End of parallel region
-// return res;
-// }
-
-// Frobenius norm
-// double norm(double ***old, double ***newVol, int N)
-// {
-// double res = 0.0;
-// int i,j,k = 0;
-// #pragma omp parallel for reduction(+:res)
-// for(int i = 1; i < N+1; i++){
-//     for(int j = 1; j < N+1; j++){
-//         for(int k = 1; k < N+1; k++){
-//             res += (old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
-//         }
-//     }
-// }
-// // } // End of parallel region
-// return res;
-// }
-
-/*
-int
-jacobi(double ***old, double ***newVol, double ***f, int max_iter, int N, double tol) {
-    // Variables we will use
-    double ***temp;
-    double h = 1.0/6.0;
-    double delta_sq = 4.0/((double) N*N+2*N+1);
-    double d = INFINITY;
-    int n = 0;
-
-    // Main loop of jacobi
-    while(d > tol && n < max_iter){
-        d = 0.0;
-        // Compute newVol 3d matrix
-        for(int i = 1; i < N+1; i++){
-            for(int j = 1; j < N+1; j++){
-                for(int k = 1; k < N+1; k++){
-                    newVol[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
-                    //Norm
-                    d+=(old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
-                }
-            }
-        }
-
-        // Switch pointers
-        temp = old;
-        old = newVol;
-        newVol = temp;
-
-        // Increment iteration counter
-        n += 1;
-
-    }
-    return n;
-}
-
-
-int
-jacobi_baseline(double ***old, double ***newVol, double ***f, int max_iter, int N, double tol) {
-    // Variables we will use
-    double ***temp;
-    double h = 1.0/6.0;
-    double delta_sq = 4.0/((double) N*N+2*N+1);
-    double d = 10000.0;
-    int n = 0;
-    
-    int i,j,k = 0;
-    // Main loop of jacobi
-    while(d > tol && n < max_iter){
-        d = 0.0;
-        #pragma omp parallel shared(old, newVol, f, N, h, delta_sq) private(i, j, k) reduction(+:d)
-        {
-        // Compute newVol 3d matrix
-            #pragma omp for
-            for(i = 1; i < N+1; i++){
-                for(j = 1; j < N+1; j++){
-                    for(k = 1; k < N+1; k++){
-                        newVol[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
-                        //Norm
-                        d+=(old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
-
-                    }
-                }
-            }
-        } // end of parallel region
-    
-
-        // Switch pointers
-        temp = old;
-        old = newVol;
-        newVol = temp;
-
-        // Increment iteration counter
-        n += 1;
-
-    }
-    return n;
-}
-*/
-
-
 int
 jacobi_improved(double ***old, double ***newVol, double ***f, int max_iter, int N, double tol) {
     
-    
     // Variables we will use
     double ***temp;
     double h = 1.0/6.0;
     double delta_sq = 4.0/((double) N*N+2*N+1);
-    // double d = 10000.0;
     int n = 0;
-    
     int i,j,k = 0;
+
     // Main loop of jacobi
     while(n < max_iter)
     {
-        // d = 0.0;
-        //#pragma omp parallel shared(old, newVol, f, N, h, delta_sq) private(i, j, k)
-        //{
+        #pragma omp parallel shared(old, newVol, f, N, h, delta_sq) private(i, j, k)
+        {
         
         // Compute newVol 3d matrix
-        #pragma omp for
+        #pragma omp for collapse(2)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
                     newVol[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
-                    //Norm
-                    // d+=(old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
                 }
             }
         } 
-        //} // End of parallel region
+
+        } // End of parallel region
 
         // Switch pointers
         temp = old;
         old = newVol;
         newVol = temp;
 
-        // // Update convergence
-        // d = norm(old, newVol, N);
-
         // Increment iteration counter
         n += 1;
-
     }
     
     return n;
@@ -181,7 +57,6 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
     double ***temp;
     double h = 1.0/6.0;
     double delta_sq = 4.0/((double) N*N+2*N+1);
-    // double d = 10000.0;
     int n = 0;
     int i,j,k = 0;
 
@@ -190,14 +65,11 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
 
     // Main loop of jacobi
     while(n < max_iter){
-        // d = 0.0;
-        #pragma omp target teams distribute parallel for shared(h, N, delta_sq) collapse(2)
+        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, N, delta_sq)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
                     newVol[i][j][k] = h*(old[i-1][j][k] + old[i+1][j][k] + old[i][j-1][k] + old[i][j+1][k] + old[i][j][k-1] + old[i][j][k+1] + delta_sq*f[i][j][k]);
-                    //Norm
-                    // d+=(old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
                 }
             }
         }
@@ -206,9 +78,6 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
         temp = old;
         old = newVol;
         newVol = temp;
-
-        // // Update convergence
-        // d = norm(old, newVol, N);
 
         // Increment iteration counter
         n += 1;
@@ -231,7 +100,6 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
     double *temp2;
     double h = 1.0/6.0;
     double delta_sq = 4.0/((double) N*N+2*N+1);
-    // double d = 10000.0;
     int n = 0;
     int i,j,k = 0;
 
@@ -250,14 +118,11 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
 
     // Main loop of jacobi
     while(n < max_iter){
-        // d = 0.0;
-        #pragma omp target teams distribute parallel for shared(h, delta_sq, N) collapse(2)
+        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, delta_sq, N)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
                     new_dev[i][j][k] = h*(old_dev[i-1][j][k] + old_dev[i+1][j][k] + old_dev[i][j-1][k] + old_dev[i][j+1][k] + old_dev[i][j][k-1] + old_dev[i][j][k+1] + delta_sq*f_dev[i][j][k]);
-                    //Norm
-                    // d+=(old[i][j][k] - newVol[i][j][k])*(old[i][j][k] - newVol[i][j][k]);
                 }
             }
         }
@@ -270,9 +135,6 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
         temp2 = data;
         data = data_new;
         data_new = temp2;
-
-        // // Update convergence
-        // d = norm(old, newVol, N);
 
         // Increment iteration counter
         n += 1;
@@ -300,7 +162,6 @@ jacobi_offload_multi(double ***old, double ***newVol, double ***f, int max_iter,
     double *temp2;
     double h = 1.0/6.0;
     double delta_sq = 4.0/((double) N*N+2*N+1);
-    // double d = 10000.0;
     int n = 0;
     int i,j,k = 0;
 
@@ -310,7 +171,6 @@ jacobi_offload_multi(double ***old, double ***newVol, double ***f, int max_iter,
     cudaDeviceEnablePeerAccess(0,0);
     cudaSetDevice(0);
 
-    // printf("test 0 \n");
     // Allocate memory on device 0
     omp_set_default_device(0);
     double *data_d0;
@@ -319,7 +179,7 @@ jacobi_offload_multi(double ***old, double ***newVol, double ***f, int max_iter,
     double ***old_dev_d0 = d_malloc_3d(N2/2, N2, N2, &data_d0);
     double ***f_dev_d0 = d_malloc_3d(N2/2, N2, N2, &data_f_d0);
     double ***new_dev_d0 = d_malloc_3d(N2/2, N2, N2, &data_new_d0);
-    // printf("test 1 \n");
+
     // Allocate memory on device 1
     omp_set_default_device(1);
     double *data_d1;
@@ -328,35 +188,33 @@ jacobi_offload_multi(double ***old, double ***newVol, double ***f, int max_iter,
     double ***old_dev_d1 = d_malloc_3d(N2/2, N2, N2, &data_d1);
     double ***f_dev_d1 = d_malloc_3d(N2/2, N2, N2, &data_f_d1);
     double ***new_dev_d1 = d_malloc_3d(N2/2, N2, N2, &data_new_d1);
-    // printf("test 2 \n");
+
     // Data transfer using memcopy
     // Device 0
     omp_set_default_device(0);
     omp_target_memcpy(data_d0, old[0][0], (N2/2)*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     omp_target_memcpy(data_f_d0, f[0][0], (N2/2)*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     omp_target_memcpy(data_new_d0, newVol[0][0], (N2/2)*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
-    // printf("test 3");
+
     // Device 1
     omp_set_default_device(1);
     omp_target_memcpy(data_d1, old[N2/2][0], (N2/2)*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     omp_target_memcpy(data_f_d1, f[N2/2][0], (N2/2)*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
     omp_target_memcpy(data_new_d1, newVol[N2/2][0], (N2/2)*N2*N2*sizeof(double), 0, 0, omp_get_default_device(), omp_get_initial_device());
-    // printf("test 4");
+
 
     // Main loop of jacobi
     while(n < max_iter){
         // Computations for device 0
-        #pragma omp target teams distribute parallel for nowait shared(h, delta_sq, N) device(0)
+        #pragma omp target teams distribute parallel for nowait shared(h, delta_sq, N) collapse(2) device(0)
         for(i = 1; i < N2/2; i++){
-            if(i < N2/2 - 1){
-                for(j = 1; j < N+1; j++){
+            for(j = 1; j < N+1; j++){
+                if(i < N2/2 - 1){
                     for(k = 1; k < N+1; k++){
                         new_dev_d0[i][j][k] = h*(old_dev_d0[i-1][j][k] + old_dev_d0[i+1][j][k] + old_dev_d0[i][j-1][k] + old_dev_d0[i][j+1][k] + old_dev_d0[i][j][k-1] + old_dev_d0[i][j][k+1] + delta_sq*f_dev_d0[i][j][k]);
                     }
                 }
-            }
-            else{
-                for(j = 1; j < N+1; j++){
+                else{
                     for(k = 1; k < N+1; k++){
                         new_dev_d0[i][j][k] = h*(old_dev_d0[i-1][j][k] + old_dev_d1[0][j][k] + old_dev_d0[i][j-1][k] + old_dev_d0[i][j+1][k] + old_dev_d0[i][j][k-1] + old_dev_d0[i][j][k+1] + delta_sq*f_dev_d0[i][j][k]);
                     }
@@ -365,17 +223,15 @@ jacobi_offload_multi(double ***old, double ***newVol, double ***f, int max_iter,
         }
 
         // Computations for device 1
-        #pragma omp target teams distribute parallel for nowait shared(h, delta_sq, N) device(1)
+        #pragma omp target teams distribute parallel for nowait shared(h, delta_sq, N) collapse(2) device(1)
         for(i = 0; i < N2/2-1; i++){
-            if(i > 0){
-                for(j = 1; j < N+1; j++){
+            for(j = 1; j < N+1; j++){
+                if(i > 0){
                     for(k = 1; k < N+1; k++){
-                        new_dev_d1[i][j][k] = h*(old_dev_d1[i-1][j][k] + old_dev_d1[i+1][j][k] + old_dev_d1[i][j-1][k] + old_dev_d1[i][j+1][k] + old_dev_d1[i][j][k-1] + old_dev_d1[i][j][k+1] + delta_sq*f_dev_d1[i][j][k]);
+                            new_dev_d1[i][j][k] = h*(old_dev_d1[i-1][j][k] + old_dev_d1[i+1][j][k] + old_dev_d1[i][j-1][k] + old_dev_d1[i][j+1][k] + old_dev_d1[i][j][k-1] + old_dev_d1[i][j][k+1] + delta_sq*f_dev_d1[i][j][k]);
                     }
                 }
-            }
-            else{
-                for(j = 1; j < N+1; j++){
+                else{
                     for(k = 1; k < N+1; k++){
                         new_dev_d1[i][j][k] = h*(old_dev_d0[N2/2-1][j][k] + old_dev_d1[i+1][j][k] + old_dev_d1[i][j-1][k] + old_dev_d1[i][j+1][k] + old_dev_d1[i][j][k-1] + old_dev_d1[i][j][k+1] + delta_sq*f_dev_d1[i][j][k]);
                     }
@@ -465,9 +321,6 @@ jacobi_offload_norm(double ***old, double ***newVol, double ***f, int max_iter, 
         temp = old;
         old = newVol;
         newVol = temp;
-
-        // // Update convergence
-        // d = norm(old, newVol, N);
 
         // Increment iteration counter
         n += 1;
