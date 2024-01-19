@@ -28,7 +28,7 @@ matmult_f.nvcc type m n k [bs]
 where m, n, k are the parameters defining the matrix sizes, bs is the
 optional blocksize for the block version, and type can be one of:
 
-nat           - the native/naïve version
+nat           - the native/naï¿½ve version
 lib           - the library version (note that CBLAS is now linked to a
                 multithreaded library that supports OMP_NUM_THREADS)
 mkn_omp       - the OpenMP mkn version
@@ -36,7 +36,7 @@ mkn_offload   - the OpenMP offload mkn version
 mnk_offload   - the OpenMP offload mnk version
 blk_offload   - the OpenMP offload blocked version (takes bs as extra argument)
 asy_offload   - the OpenMP offload asynchronous version
-lib_offload   - the OpenMP offload CUBLAS library version
+lib_offload2   - the OpenMP offload CUBLAS library version
 exp_offload   - the OpenMP offload experimental version (if needed)
 
 as well as blk, mnk, nmk, ... (the permutations).
@@ -59,3 +59,6 @@ resources during the development, testing, and benchmarking of your code!
 With the help of this driver program, you should be able to run all matrix 
 multiplication experiments needed for Assignment 3 in the same manner as for
 Assignment 1. 
+
+*** GROUP 4 CHANGES ***
+*** New env variable for data transfer printing, PRINT_DATA_TRANSFER_TIME=0 or 1 ***
