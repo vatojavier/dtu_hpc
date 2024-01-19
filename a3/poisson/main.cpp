@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
         time_start = omp_get_wtime();
         used_iter = jacobi_offload_norm(u, u2, f, iter_max, N, tolerance);
         time_end = omp_get_wtime();
-        printf("%d %d %lf GPUMNRM \n", N, iter_max, time_end - time_start);
+        printf("%d %d %lf GPUMNRM \n", N, used_iter, time_end - time_start);
         break;
     default:
         break;
