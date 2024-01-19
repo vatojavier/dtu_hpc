@@ -65,7 +65,7 @@ jacobi_offload_map(double ***old, double ***newVol, double ***f, int max_iter, i
 
     // Main loop of jacobi
     while(n < max_iter){
-        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(10*N) shared(h, N, delta_sq) collapse(2)
+        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, N, delta_sq) collapse(2)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
@@ -118,7 +118,7 @@ jacobi_offload_memcopy(double ***old, double ***newVol, double ***f, int max_ite
 
     // Main loop of jacobi
     while(n < max_iter){
-        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(10*N) shared(h, delta_sq, N) is_device_ptr(old_dev, f_dev, new_dev) collapse(2) 
+        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, delta_sq, N) is_device_ptr(old_dev, f_dev, new_dev) collapse(2) 
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
@@ -207,7 +207,7 @@ jacobi_offload_multi(double ***old, double ***newVol, double ***f, int max_iter,
     while(n < max_iter){
         // Computations for device 0
         omp_set_default_device(0);
-        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(10*N) nowait shared(h, delta_sq, N, N2) is_device_ptr(old_dev_d0, new_dev_d0, f_dev_d0) collapse(2) device(0)
+        #pragma omp target teams distribute parallel for nowait shared(h, delta_sq, N, N2) is_device_ptr(old_dev_d0, new_dev_d0, f_dev_d0) collapse(2) device(0)
         for(i = 1; i < N2/2; i++){
             for(j = 1; j < N+1; j++){
                 if(i < N2/2 - 1){
@@ -225,7 +225,7 @@ jacobi_offload_multi(double ***old, double ***newVol, double ***f, int max_iter,
 
         // Computations for device 1
         omp_set_default_device(1);
-        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(10*N) nowait shared(h, delta_sq, N, N2) is_device_ptr(old_dev_d1, new_dev_d1, f_dev_d1) collapse(2) device(1) 
+        #pragma omp target teams distribute parallel for nowait shared(h, delta_sq, N, N2) is_device_ptr(old_dev_d1, new_dev_d1, f_dev_d1) collapse(2) device(1) 
         for(i = 0; i < N2/2-1; i++){
             for(j = 1; j < N+1; j++){
                 if(i > 0){
@@ -308,7 +308,7 @@ jacobi_offload_norm(double ***old, double ***newVol, double ***f, int max_iter, 
     // Main loop of jacobi
     while(d > tol && n < max_iter){
         d = 0.0;
-        #pragma omp target teams distribute parallel for num_teams(114) thread_limit(1000) shared(h, N, delta_sq) reduction(+: d) collapse(2)
+        #pragma omp target teams distribute parallel for shared(h, N, delta_sq) reduction(+: d) collapse(2)
         for(i = 1; i < N+1; i++){
             for(j = 1; j < N+1; j++){
                 for(k = 1; k < N+1; k++){
