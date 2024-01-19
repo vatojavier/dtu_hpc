@@ -82,7 +82,7 @@ extern "C" {
 }
 
     void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
-    #define BLK 4
+    #define BLK 8
     zeroC(m, n, C);
     double start_time, end_time, data_in_time, computation_time, data_out_time;
 
@@ -94,7 +94,7 @@ extern "C" {
 
     // Computation
     start_time = omp_get_wtime();
-    #pragma omp target teams loop num_teams(m) thread_limit(16) \
+    #pragma omp target teams loop \
     map(to: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n]) collapse(2)
     for (int i = 0; i < m; i += BLK) { 
         for (int j = 0; j < n; ++j) { 
@@ -167,7 +167,7 @@ extern "C" {
 
             #pragma omp target update to(A[start:length][0:k], C[start:length][0:n]) nowait
             #pragma omp target teams distribute parallel for \
-            num_teams(length) thread_limit(16) collapse(2) nowait\
+            num_teams(length) thread_limit(32) collapse(2) nowait\
             depend(in: A[start:length][0:k], B[0:k][0:n]) \
             depend(out: C[start:length][0:n])
             
