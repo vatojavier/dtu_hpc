@@ -1,25 +1,30 @@
 #!/bin/sh
-#BSUB -J g4_bench_norm
-#BSUB -o g4_bench_norm_%J.out
-#BSUB -e g4_bench_norm_%J.err
+#BSUB -J g4_d3_norm_set
+#BSUB -o g4_d3_norm_set_%J.out
+#BSUB -e g4_d3_norm_set_%J.err
 #BSUB -q hpcintrogpu
 #BSUB -n 32
 #BSUB -N
 #BSUB -R "span[hosts=1]" 
-#BSUB -gpu "num=2:mode=exclusive_process" 
-#BSUB -W 10
+#BSUB -gpu "num=1:mode=exclusive_process" 
+#BSUB -W 30
 #BSUB -R "rusage[mem=2048]" 
 
 module load /appl9/nvhpc/2023_2311/modulefiles/nvhpc-nompi/23.11
 
 RESOLUTION="100 150 200 250 300 350 400"
+RESOL="100 150 200 250 300 350 400 450 500 550 600"
 
 THREADS="24"
 
-ITERATIONS="5000"
+ITERATIONS="1000 2000 3000 4000 5000"
 
+EXPMENTS="2 3 4 5"
 
-for R in $RESOLUTION
+echo "res iterations seconds type"
+
+for R in $RESOL
 do
-./poisson $R 5000 0.005 0.0 0 5
-done 
+./poisson $R 2000 0.005 0.0 0 5
+done
+
