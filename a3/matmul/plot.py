@@ -28,3 +28,24 @@ ax.xaxis.set_major_formatter(ScalarFormatter())
 ax.legend()
 plt.savefig('out/ordering_exp.pdf', bbox_inches='tight')
 plt.show()
+
+#%% blk size
+df = pd.read_csv('out/blk_size.out', sep='\t')
+df.columns = ['blk size', 'Mflops/s']
+
+
+# Plot
+fig, ax = plt.subplots(figsize=(10, 6))
+for key, grp in df.groupby(['type']):
+    # if np.array(grp['type']).any() == 'lib':
+    #     continue
+    ax.semilogx(grp['Memory (kB)'], grp['Mflops/s'], label=key[0], base=2, marker='o', linestyle='dashed')
+# ax.vlines([32, 256+32, 30720+256+32], df['Mflops/s'].min(), df['Mflops/s'].max(), colors='r', linestyles='dashed', label='L1, L2, L3')
+ax.set_xlabel('Memory (kB)')
+ax.set_ylabel('Mflops/s')
+ax.set_title('Matrix multiplication performance')
+ax.xaxis.set_major_formatter(ScalarFormatter())
+ax.legend()
+plt.savefig('out/ordering_exp.pdf', bbox_inches='tight')
+plt.show()
+# %%
