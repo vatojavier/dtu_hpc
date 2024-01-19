@@ -221,22 +221,6 @@ extern "C" {
         }
     }
 
-    void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) {
-        zeroC(m, n, C);
-        #pragma omp parallel shared(A, B, C)
-        {
-        #pragma omp for 
-        for (int i = 0; i < m; i++) {
-            for (int l = 0; l < k; l++) {
-                for (int j = 0; j < n; j++){
-                    C[i][j] += A[i][l] * B[l][j];
-                }
-            }
-        }
-
-        } // end of parallel region
-    }
-
     void matmult_mkn_offload(int m, int n, int k, double **A, double **B, double **C) {
     zeroC(m, n, C);
     double start_time, end_time, data_in_time, computation_time, data_out_time;
@@ -275,16 +259,6 @@ extern "C" {
     }
     }
 
-    void matmult_mnk(int m, int n, int k, double **A, double **B, double **C) {
-        zeroC(m, n, C);
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++){
-                for (int l = 0; l < k; l++) {
-                    C[i][j] += A[i][l] * B[l][j];
-                }
-            }
-        }
-    }
 
     void matmult_mnk_offload(int m, int n, int k, double **A, double **B, double **C) {
     zeroC(m, n, C);
