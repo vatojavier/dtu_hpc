@@ -1,7 +1,7 @@
 #!/bin/sh
-#BSUB -J g4_prof_norm
-#BSUB -o g4_prof_norm_%J.out
-#BSUB -e g4_prof_norm_%J.err
+#BSUB -J g4_prof_dual
+#BSUB -o g4_prof_dual_%J.out
+#BSUB -e g4_prof_dual_%J.err
 #BSUB -q hpcintrogpu
 #BSUB -n 32
 #BSUB -N
@@ -12,4 +12,4 @@
 
 module load /appl9/nvhpc/2023_2311/modulefiles/nvhpc-nompi/23.11
 
-nsys profile ./poisson 200 2000 0.0005 0.0 0 5
+nsys profile ./poisson 400 2000 0.0005 0.0 0 4
