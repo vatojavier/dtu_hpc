@@ -221,22 +221,6 @@ extern "C" {
         }
     }
 
-    void matmult_mkn_omp(int m, int n, int k, double **A, double **B, double **C) {
-        zeroC(m, n, C);
-        #pragma omp parallel shared(A, B, C)
-        {
-        #pragma omp for 
-        for (int i = 0; i < m; i++) {
-            for (int l = 0; l < k; l++) {
-                for (int j = 0; j < n; j++){
-                    C[i][j] += A[i][l] * B[l][j];
-                }
-            }
-        }
-
-        } // end of parallel region
-    }
-
     void matmult_mkn_offload(int m, int n, int k, double **A, double **B, double **C) {
     zeroC(m, n, C);
     double start_time, end_time, data_in_time, computation_time, data_out_time;
@@ -275,57 +259,24 @@ extern "C" {
     }
     }
 
-    void matmult_mnk(int m, int n, int k, double **A, double **B, double **C) {
-        zeroC(m, n, C);
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++){
-                for (int l = 0; l < k; l++) {
-                    C[i][j] += A[i][l] * B[l][j];
-                }
-            }
-        }
-    }
 
+    
     void matmult_mnk_offload(int m, int n, int k, double **A, double **B, double **C) {
-    zeroC(m, n, C);
-    double start_time, end_time, data_in_time, computation_time, data_out_time;
+        zeroC(m, n, C);
 
-    // Data transfer to the GPU
-    start_time = omp_get_wtime();
-    #pragma omp target enter data map(to: A[0:m][0:k], B[0:k][0:n]) map(to: C[0:m][0:n])
-    end_time = omp_get_wtime();
-    data_in_time = end_time - start_time;
 
-    // Computation
-    start_time = omp_get_wtime();
-    #pragma omp target teams distribute parallel for map(to: A[0:m][0:k], B[0:k][0:n]) map(tofrom: C[0:m][0:n]) \
-    num_teams(m) thread_limit(16)
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            double sum = 0.0;
-            for (int l = 0; l < k; l++) {
-                sum += A[i][l] * B[l][j];
+        #pragma omp target teams distribute parallel for map(to: A[0:m][0:k], B[0:k][0:n]) map(tofrom: C[0:m][0:n])
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                double sum = 0.0;
+                for (int l = 0; l < k; l++) {
+                    sum += A[i][l] * B[l][j];
+                }
+                C[i][j] = sum;
             }
-            C[i][j] = sum;
         }
-    }
-    end_time = omp_get_wtime();
-    computation_time = end_time - start_time;
 
-    // Data transfer from the GPU
-    start_time = omp_get_wtime();
-    #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
-    end_time = omp_get_wtime();
-    data_out_time = end_time - start_time;
-
-    // Check if the environment variable is set
-    char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
-    if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
-        printf("Data Transfer In Time: %f seconds\n", data_in_time);
-        printf("Computation Time: %f seconds\n", computation_time);
-        printf("Data Transfer Out Time: %f seconds\n", data_out_time);
     }
-}
 
        
 } // end of extern "C"
