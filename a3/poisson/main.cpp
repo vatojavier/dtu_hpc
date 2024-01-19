@@ -87,24 +87,32 @@ int main(int argc, char *argv[])
         printf("%d %d %lf CPU \n", N, iter_max , time_end - time_start);
         break;
     case 2:
+        warmUp();
         time_start = omp_get_wtime();
         used_iter = jacobi_offload_map(u, u2, f, iter_max, N, tolerance);
         time_end = omp_get_wtime();
         printf("%d %d %lf GPUMAP \n", N, iter_max, time_end - time_start);
         break;
     case 3:
+        warmUp();
         time_start = omp_get_wtime();
         used_iter = jacobi_offload_memcopy(u, u2, f, iter_max, N, tolerance);
         time_end = omp_get_wtime();
         printf("%d %d %lf GPUMEM \n", N, iter_max, time_end - time_start);
         break;
     case 4:
+        omp_set_default_device(0);
+        warmUp();
+        omp_set_default_device(1);
+        warmUp();
+        omp_set_default_device(0);
         time_start = omp_get_wtime();
         used_iter = jacobi_offload_multi(u, u2, f, iter_max, N, tolerance);
         time_end = omp_get_wtime();
         printf("%d %d %lf GPUMUL \n", N, iter_max, time_end - time_start);
         break;
     case 5:
+        warmUp();
         time_start = omp_get_wtime();
         used_iter = jacobi_offload_norm(u, u2, f, iter_max, N, tolerance);
         time_end = omp_get_wtime();
