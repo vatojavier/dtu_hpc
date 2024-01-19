@@ -26,35 +26,6 @@ extern "C" {
         }
     }
 
-    // I give up on this version I can only find examples online where they have double * pointers 
-    // see ex https://github.com/colleeneb/openmp_offload_and_blas/blob/master/cublas/c/dgemm_cublas.c
-    // 2
-    void matmult_lib_offload2(int m, int n, int k, double *A, double *B, double *C) {
-        cublasHandle_t handle;
-        cublasCreate(&handle);
-
-        double alpha = 1.0;
-        double beta = 0.0;
-        int lda = m; // Assuming A is m x k in row-major
-        int ldb = k; // Assuming B is k x n in row-major
-        int ldc = m; // Assuming C is m x n in row-major
-
-        // Ensure A, B, and C are allocated and initialized correctly before this point
-
-        // Transfer data to the GPU
-        #pragma omp target enter data map(to: A[0:m*k], B[0:k*n]) map(to: C[0:m*n])
-
-        #pragma omp target data use_device_ptr(A, B, C)
-        {
-            cublasDgemm(handle, CUBLAS_OP_T, CUBLAS_OP_T, n, m, k, &alpha, B, ldb, A, lda, &beta, C, ldc);
-        }
-
-        cublasDestroy(handle);
-
-        // Transfer results back to the host
-        #pragma omp target exit data map(from: C[0:m*n]) map(release: A[0:m*k], B[0:k*n])
-    }
-
     void matmult_lib_offload(int m, int n, int k, double **A, double **B, double **C) {
     cublasHandle_t handle;
     cublasCreate(&handle);
@@ -110,7 +81,6 @@ extern "C" {
     }
 }
 
-
     void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
     #define BLK 4
     zeroC(m, n, C);
@@ -125,7 +95,7 @@ extern "C" {
     // Computation
     start_time = omp_get_wtime();
     #pragma omp target teams loop num_teams(m) thread_limit(16) \
-    map(tofrom: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n]) collapse(2)
+    map(to: C[0:m][0:n]) map(to: A[0:m][0:k], B[0:k][0:n]) collapse(2)
     for (int i = 0; i < m; i += BLK) { 
         for (int j = 0; j < n; ++j) { 
             if (i + BLK - 1 < m) { 
@@ -140,14 +110,12 @@ extern "C" {
                 }
             } else { 
                 // Do the remainder part here 
-                    double sum[BLK] = {0}; 
-                    for (int l = 0; l < k; l++) { 
-                        for (int ii = i; ii < m; ii++) { 
-                            sum[ii-i] += A[ii][l] * B[l][j]; 
-                        }
-                    }
-                    for (int ii = i; ii < m; ii++) { 
-                        C[ii][j] += sum[ii-i]; 
+                        for (int ii = 0; ii < (m-i); ii++) { 
+                            double sum = 0.0; 
+                            for (int l = 0; l < k; l++) {
+                                sum += A[i+ii][l] * B[l][j]; 
+                            }
+                            C[i+ii][j] = sum; 
                     }
             }
         }
@@ -185,22 +153,24 @@ extern "C" {
         
         // Data transfer into the device
         start_time = omp_get_wtime();
-
-        #pragma omp target enter data map(alloc: A[0:m][0:k], C[0:m][0:n])
+        #pragma omp target enter data map(alloc: A[0:m][0:k], C[0:m][0:n]) 
         #pragma omp target enter data map(to: B[0:k][0:n])
         end_time = omp_get_wtime();
         data_in_time = end_time - start_time;
 
         // Parallel loop for each slab
+        double start_compute_time = omp_get_wtime();  // Start timing computation
         #pragma omp parallel for reduction(+:computation_time)
         for (int s = 0; s < SLAPS; ++s) {
             int length = m / SLAPS;
             int start = s * length;
 
             #pragma omp target update to(A[start:length][0:k], C[start:length][0:n]) nowait
-
             #pragma omp target teams distribute parallel for \
-            num_teams(length) thread_limit(16) collapse(2) nowait
+            num_teams(length) thread_limit(16) collapse(2) nowait\
+            depend(in: A[start:length][0:k], B[0:k][0:n]) \
+            depend(out: C[start:length][0:n])
+            
             for (int i = start; i < start+length; i += BLK) { 
                 for (int j = 0; j < n; ++j) { 
                     if (i + BLK - 1 < m) { 
@@ -228,9 +198,13 @@ extern "C" {
                     }
                 }
             } 
-            // #pragma omp target update from(C[start:length][0:n]) nowait
+        #pragma omp target update from(C[start:length][0:n]) nowait
         }
-        // #pragma omp taskwait
+        #pragma omp taskwait
+        
+        double end_compute_time = omp_get_wtime();  // End timing computation
+        computation_time = end_compute_time - start_compute_time;
+
         start_time = omp_get_wtime();
         #pragma omp target exit data map(from: C[0:m][0:n]) map(release: A[0:m][0:k], B[0:k][0:n])
         end_time = omp_get_wtime();
@@ -243,7 +217,7 @@ extern "C" {
             printf("Data Transfer In Time: %f seconds\n", data_in_time);
             printf("Computation Time: %f seconds\n", computation_time);
             printf("Data Transfer Out Time: %f seconds\n", data_out_time);
-            printf("Total Data Transfer Time (including async): %f seconds\n", total_data_transfer_time);
+            // printf("Total Data Transfer Time (including async): %f seconds\n", total_data_transfer_time);
         }
     }
 
