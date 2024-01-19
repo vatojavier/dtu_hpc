@@ -56,39 +56,60 @@ extern "C" {
     }
 
     void matmult_lib_offload(int m, int n, int k, double **A, double **B, double **C) {
-        cublasHandle_t handle;
-        cublasCreate(&handle);
+    cublasHandle_t handle;
+    cublasCreate(&handle);
 
-        // device pointers
-        double *d_A, *d_B, *d_C;
-        cudaMalloc((void **)&d_A, m * k * sizeof(double));
-        cudaMalloc((void **)&d_B, k * n * sizeof(double));
-        cudaMalloc((void **)&d_C, m * n * sizeof(double));
-        // move data to device
-        cudaMemcpy(d_A, *A, m * k * sizeof(double), cudaMemcpyHostToDevice);
-        cudaMemcpy(d_B, *B, k * n * sizeof(double), cudaMemcpyHostToDevice);
+    // device pointers
+    double *d_A, *d_B, *d_C;
+    cudaMalloc((void **)&d_A, m * k * sizeof(double));
+    cudaMalloc((void **)&d_B, k * n * sizeof(double));
+    cudaMalloc((void **)&d_C, m * n * sizeof(double));
+    
+    double start_time, end_time;
+    double data_in_time = 0.0, computation_time = 0.0, data_out_time = 0.0;
 
-        double alpha = 1.0;
-        double beta = 0.0;
+    // Data Transfer In
+    start_time = omp_get_wtime();
+    cudaMemcpy(d_A, *A, m * k * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_B, *B, k * n * sizeof(double), cudaMemcpyHostToDevice);
+    end_time = omp_get_wtime();
+    data_in_time = end_time - start_time;
 
-        // why does it also work if we have the transposed leading dimensions?
-        // cublas is fortran-order
-        int lda = m;
-        int ldb = k;
-        int ldc = m;
+    double alpha = 1.0;
+    double beta = 0.0;
 
-        int cublas_error = cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha, d_A, lda, d_B, ldb, &beta, d_C, ldc);
-        if (cublas_error != CUBLAS_STATUS_SUCCESS) {
-            printf("Error in cublasDgemm!\n");
-        }
+    // Computation
+    start_time = omp_get_wtime();
+    int lda = m;
+    int ldb = k;
+    int ldc = m;
+    int cublas_error = cublasDgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha, d_A, lda, d_B, ldb, &beta, d_C, ldc);
+    if (cublas_error != CUBLAS_STATUS_SUCCESS) {
+        printf("Error in cublasDgemm!\n");
+    }
+    end_time = omp_get_wtime();
+    computation_time = end_time - start_time;
 
-        cudaMemcpy(*C, d_C, m * n * sizeof(double), cudaMemcpyDeviceToHost);
+    // Data Transfer Out
+    start_time = omp_get_wtime();
+    cudaMemcpy(*C, d_C, m * n * sizeof(double), cudaMemcpyDeviceToHost);
+    end_time = omp_get_wtime();
+    data_out_time = end_time - start_time;
 
-        cudaFree(d_A);
-        cudaFree(d_B);
-        cudaFree(d_C);
-        cublasDestroy(handle);
+    cudaFree(d_A);
+    cudaFree(d_B);
+    cudaFree(d_C);
+    cublasDestroy(handle);
+
+    // Output or use the timing information
+    char *printFlag = getenv("PRINT_DATA_TRANSFER_TIME");
+    if (printFlag != NULL && strcmp(printFlag, "1") == 0) {
+        printf("Data Transfer In Time: %f seconds\n", data_in_time);
+        printf("Computation Time: %f seconds\n", computation_time);
+        printf("Data Transfer Out Time: %f seconds\n", data_out_time);
+    }
 }
+
 
     void matmult_blk_offload(int m, int n, int k, double **A, double **B, double **C) {
     #define BLK 4
